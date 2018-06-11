@@ -65,6 +65,7 @@ def FrequentWords(Text,k):
 		if count[i]==maxCount:
 			FrequentPatterns.append(Text[i:i+k])
 	return list(set(FrequentPatterns))
+
 # print FrequentWords("TAAACGTGAGAGAAACGTGCTGATTACACTTGTTCGTGTGGTAT",3)
 
 
@@ -133,16 +134,18 @@ def ApproximatePatternMatching(Text, Pattern, d):
 	k=len(Pattern)
 	return [i for i in range(L-k+1) if HammingDistance(Pattern,Text[i:i+k])<=d]
 
-# file = open("dataset_9_3.txt","r")
-# l1 = file.readline()
-# l2 = file.readline()
-# print HammingDistance(l1,l2)
+ # file = open("dataset_9_3.txt","r")
+ # l1 = file.readline()
+ # l2 = file.readline()
+ # print HammingDistance(l1,l2)
 
 # file = open("dataset_9_4.txt","r")
 # Pattern=file.readline().strip()
 # Text=file.readline().strip()
 # d=int(file.readline().strip())
 # print ApproximatePatternMatching(Text,Pattern,d)
+
+
 def ApproximatePatternCount(Text, Pattern, d):
 	L=len(Text)
 	k=len(Pattern)
@@ -155,21 +158,33 @@ def ApproximatePatternCount(Text, Pattern, d):
 
 # print ApproximatePatternCount(Text, Pattern, d)
 	
+def Neighbors(Pattern, d):
+	nucleotides = ["A","C","G","T"]
+	if d==0:
+		return Pattern
+	if len(Pattern)==1:
+		return set(nucleotides)
+	Neighborhood = set()
+	SuffixNeighbors = Neighbors(Pattern[1:],d)
+	for text in SuffixNeighbors:
+		if HammingDistance(text,Pattern[1:])<d:
+			for nucleotide in nucleotides:
+				Neighborhood.add(nucleotide+text)
+		else:
+			Neighborhood.add(Pattern[0]+text)
+	return Neighborhood
+
+
 
 def FrequentWordsWithMismatches(Text, k, d):
-	count=[]
-	FrequentPatterns=[]
-	
+	FrequencyArray =[0]*(4**k)
 	for i in range(len(Text)-k):
-		count.append(ApproximatePatternCount(Text,Text[i:i+k],d))
-	maxCount = max(count)
-	for i in range(len(count)):
-		if count[i]==maxCount:
-			FrequentPatterns.append(Text[i:i+k])
-	return list(set(FrequentPatterns))
+		Pattern = Text[i:i+k]
+		Neighborhood=Neighbors(Pattern,d)		
+		for 
 
-Text="AAAAAAAAAA"
-k=2
-d=1
+# print FrequentWordsWithMismatches(Text,k,d)
 
-print FrequentWordsWithMismatches(Text,k,d)
+
+
+
