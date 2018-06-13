@@ -213,8 +213,7 @@ def FrequentWordsWithMismatches(Text, k, d):
 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
 
 def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-	close =[0]*(4**k) 
-	closeRev =[0]*(4**k) 
+	close =[0]*(4**k) 	
 	Neighborhood=[]
 	NeighborhoodRev=[]
 	for i in range(len(Text)-k+1):
