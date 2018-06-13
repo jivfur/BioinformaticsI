@@ -212,29 +212,71 @@ def FrequentWordsWithMismatches(Text, k, d):
 	maximum = max(close)
 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
 
+# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
+# 	close =[0]*(4**k) 	
+# 	closeRev =[0]*(4**k) 	
+# 	Neighborhood=[]
+# 	NeighborhoodRev=[]
+# 	for i in range(len(Text)-k+1):
+# 		Pattern = Text[i:i+k]		
+# 		Neighborhood+=Neighbors(Pattern,d)
+# 		NeighborhoodRev+=Neighbors(ReverseComplement(Pattern),d)
+# 	for i in range(len(Neighborhood)):					
+# 		close[PatternToNumber(Neighborhood[i])]+=ApproximatePatternCount(Text,Neighborhood[i],d)
+# 		closeRev[PatternToNumber(NeighborhoodRev[i])]+=ApproximatePatternCount(Text,NeighborhoodRev[i],d)
+# 	res = [close[i]+closeRev[i] for i in range(len(close))]
+# 	maximum = max(res)		
+# 	return [NumberToPattern(i,k) for i in range(len(res)) if res[i]==maximum]
+
+# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
+# 	close =[0]*(4**k) 	
+# 	closeRev =[0]*(4**k) 	
+# 	Neighborhood=[]
+# 	NeighborhoodRev=[]
+# 	for i in range(len(Text)-k+1):
+# 		Pattern = Text[i:i+k]		
+# 		Neighborhood+=Neighbors(Pattern,d)		
+# 	for neighbor in Neighborhood:
+# 		j = PatternToNumber(neighbor)
+# 		close[j]+=ApproximatePatternCount(Text,neighbor,d)		
+# 		NeighborhoodRev=Neighbors(ReverseComplement(neighbor),d)
+		
+# 		if neighbor in NeighborhoodRev:
+# 			NeighborhoodRev.remove(neighbor)
+# 		print NeighborhoodRev
+# 		print"----------------------------------------------------"
+# 		for neighborrev in NeighborhoodRev:
+# 			rev=PatternToNumber(neighborrev)
+# 			close[rev]+=ApproximatePatternCount(Text,neighborrev,d)	
+# 	print len(close)
+# 	print close
+# 	maximum = max(close)		
+# 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
+
+
 def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-	close =[0]*(4**k) 	
-	Neighborhood=[]
-	NeighborhoodRev=[]
-	for i in range(len(Text)-k+1):
-		Pattern = Text[i:i+k]		
-		Neighborhood+=Neighbors(Pattern,d)
-		NeighborhoodRev+=Neighbors(ReverseComplement(Pattern),d)
-	Neighborhood=list(set(Neighborhood))
-	NeighborhoodRev=list(set(NeighborhoodRev))
-	for neighbor in Neighborhood:			
-		close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)
+	close =[0]*(len(Text)-k+1) 	
+	closeRev =[0]*len(close) 
+	for i in range(len(Text)-k+1):		
+		Pattern =Text[i:i+k]				
+		PatternRev = ReverseComplement(Pattern)		
+		close[i]+=ApproximatePatternCount(Text,Pattern,d)		
+		close[i]+=ApproximatePatternCount(Text,PatternRev,d)	
 	print close
-	for neighbor in NeighborhoodRev:
-		close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)	
 	maximum = max(close)
-	print close
-	print maximum
-	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
+	return [Text[i:i+k] for i in range(len(close)) if close[i]==maximum]
 
-Text = "AGTCAGTC"
+
+
+# Text = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
+# k= 4
+# d= 1
+"AAA","AAT","ACA","AGA","ATA","ATC","ATG","ATT","CAT","CTA","GAT","GTA","TAA","TAC","TAG","TAT","TCT","TGT","TTA","TTT"
+Text = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
 k= 4
-d= 2
+d= 1
+output=["ACAT","ATGT"]
+output2 = ['ATGC', 'ATGT', 'GATG']
+# print FrequentWordsWithMismatches(Text,k,d)
 print FrequentWordsWithMismatchesAndReverseComplements(Text,k,d)
-
 
