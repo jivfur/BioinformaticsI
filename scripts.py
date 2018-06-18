@@ -79,8 +79,6 @@ def PatternMatching(Pattern, Genome):
 	t=len(Genome)
 	return [i for i in range(t-k+1) if Pattern==Genome[i:i+k]]
 
-Text = "GACGATATACGACGATA"
-Pattern = "ATA"
 
 
 
@@ -93,18 +91,18 @@ def Skew(Genome):
 	return skewArray
 
 
-def MinimumSkew(Genome):
-	vals = {"A":0,"C":-1, "G":1,"T":0}
-	skewArray=[0]
-	minValue = 1000
-	for i in range(1, len(Genome)+1):
-		skewArray.append(skewArray[i-1]+vals[Genome[i-1]])
-		if minValue > skewArray[i]:
-			minValue = skewArray[i]
-			indexes=[i]
-		elif minValue ==skewArray[i]:
-			indexes.append(i)
-	return indexes
+# def MinimumSkew(Genome):
+# 	vals = {"A":0,"C":-1, "G":1,"T":0}
+# 	skewArray=[0]
+# 	minValue = 1000
+# 	for i in range(1, len(Genome)+1):
+# 		skewArray.append(skewArray[i-1]+vals[Genome[i-1]])
+# 		if minValue > skewArray[i]:
+# 			minValue = skewArray[i]
+# 			indexes=[i]
+# 		elif minValue ==skewArray[i]:
+# 			indexes.append(i)
+# 	return indexes
 
 def MinimumSkew(Genome):
 	vals = {"A":0,"C":-1, "G":1,"T":0}
@@ -115,8 +113,18 @@ def MinimumSkew(Genome):
 	indexes = [i for i in range(len(skewArray)) if skewArray[i]==min(skewArray)]
 	return indexes
 
+# print "MIN SKEW: ",MinimumSkew("CATTCCAGTACTTCGATGATGGCGTGAAGA")
 
 
+def MaximumSkew(Genome):
+	vals = {"A":0,"C":-1, "G":1,"T":0}
+	skewArray=[0]
+	for i in range(1, len(Genome)+1):
+		skewArray.append(skewArray[i-1]+vals[Genome[i-1]])		
+	indexes = [i for i in range(len(skewArray)) if skewArray[i]==max(skewArray)]
+	return indexes
+
+#print Skew("CATTCCAGTACTTCATGATGGCGTGAAGA")
 # file = open("dataset_7_6.txt","r")
 # text = file.read().strip()
 # print MinimumSkew(text)
@@ -128,6 +136,8 @@ def HammingDistance(p, q):
 			hd+=1
 	return hd
 
+
+# print "HAMMING: ",HammingDistance("CAGAAAGGAAGGTCCCCATACACCGACGCACCAGTTTA","CACGCCGTATGCATAAACGAGCCGCACGAACCAGAGAG")
 
 def ApproximatePatternMatching(Text, Pattern, d):    
 	L=len(Text)
@@ -155,6 +165,8 @@ def ApproximatePatternCount(Text, Pattern, d):
 # Text=file.readline().strip()
 # d=int(file.readline().strip())
 
+# print "COUNT1:", ApproximatePatternCount("TACGCATTACAAAGCACA", "AA",1)
+# print ApproximatePatternCount("CATGCCATTCGCATTGTCCCAGTGA", "CCC",2)
 
 # print ApproximatePatternCount(Text, Pattern, d)
 	
@@ -171,10 +183,8 @@ def Neighbors(Pattern, d):
 			for nucleotide in nucleotides:
 				Neighborhood.add(nucleotide+text)
 		else:
-			Neighborhood.add(Pattern[0]+text)
+			Neighborhood.add(Pattern[0]+text)	
 	return Neighborhood
-
-
 
 # def ComputingFrequenciesWithMismatches(Text, k, d):
 # 	close =[0]*(4**k) #All the posibilities.	
@@ -212,6 +222,17 @@ def FrequentWordsWithMismatches(Text, k, d):
 	maximum = max(close)
 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
 
+
+def ComputingFrequentWordsWithMismatches(Text, k, d):
+	close =[0]*(4**k) #All the posibilities.
+	Neighborhood=[]
+	for i in range(len(Text)-k+1):
+		Pattern = Text[i:i+k]		
+		Neighborhood+=Neighbors(Pattern,d)	
+	Neighborhood=list(set(Neighborhood))
+	for neighbor in Neighborhood:			
+		close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)
+	return close
 # def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
 # 	close =[0]*(4**k) 	
 # 	closeRev =[0]*(4**k) 	
@@ -254,29 +275,71 @@ def FrequentWordsWithMismatches(Text, k, d):
 # 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
 
 
-def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-	close =[0]*(len(Text)-k+1) 	
-	closeRev =[0]*len(close) 
-	for i in range(len(Text)-k+1):		
-		Pattern =Text[i:i+k]				
-		PatternRev = ReverseComplement(Pattern)		
-		close[i]+=ApproximatePatternCount(Text,Pattern,d)		
-		close[i]+=ApproximatePatternCount(Text,PatternRev,d)	
-	print close
+# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
+# 	close =[0]*(4**k) 	
+# 	# closeRev =[0]*(4**k) 
+# 	for i in range(len(Text)-k+1):		
+# 		Pattern =Text[i:i+k]				
+# 		PatternRev = ReverseComplement(Pattern)
+# 		Neighborhood = Neighbors(Pattern,d)
+# 		for neighbor in Neighborhood:
+# 			close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)		
+# 		Neighborhood = Neighbors(PatternRev,d)
+# 		for neighbor in Neighborhood:
+# 			close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)		
+	
+# 	maximum = max(close)
+# 	vec = [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
+# 	final=[]		
+# 	for v in vec:
+# 		final.append(v)
+# 		final.append(ReverseComplement(v))
+# 	return sorted(list(set(final)))
+
+
+def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):		
+	array1 = ComputingFrequentWordsWithMismatches(Text, k, d)
+	array2 = ComputingFrequentWordsWithMismatches(ReverseComplement(Text), k, d)
+	close = [array1[i]+array2[i] for i in range(len(array1))]
 	maximum = max(close)
-	return [Text[i:i+k] for i in range(len(close)) if close[i]==maximum]
+	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
 
 
 
+# Text = "AGTAGCAGCATTAAGCATTAAAGTTGCAGCATTGCATAAGAAAGTTAAAGAGGCATTGCAGCATTGCAGCATTTAAGAGGCATAAGAGGCAAGTTAATTGCAGCAAGTAAGAATAGCAAAAGAGTAGCAAGGCATTAAGCAAAGCAAATTAGTATATAAGAGGCATTAGGCAAAAATAAGGCAGCAAGAAGCAAGAATATAGCAAATTTATAAGTTAAAGAGAAAAGCAGCAGCAAGTTAGAGAAAG"
+# k= 7
+# d= 2
+# "AAA","AAT","ACA","AGA","ATA","ATC","ATG","ATT","CAT","CTA","GAT","GTA","TAA","TAC","TAG","TAT","TCT","TGT","TTA","TTT"
 # Text = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
 # k= 4
 # d= 1
-"AAA","AAT","ACA","AGA","ATA","ATC","ATG","ATT","CAT","CTA","GAT","GTA","TAA","TAC","TAG","TAT","TCT","TGT","TTA","TTT"
-Text = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
-k= 4
-d= 1
-output=["ACAT","ATGT"]
-output2 = ['ATGC', 'ATGT', 'GATG']
-# print FrequentWordsWithMismatches(Text,k,d)
-print FrequentWordsWithMismatchesAndReverseComplements(Text,k,d)
+# output=["ACAT","ATGT"]
+# output2 = ['ATGC', 'ATGT', 'GATG']
+# # print FrequentWordsWithMismatches(Text,k,d)
+# print " ".join(sorted(FrequentWordsWithMismatchesAndReverseComplements(Text,k,d)))
+
+
+
+
+def MotifEnumeration(Dna,k,d):
+	Patterns=[0]*(4**k)	
+	count=0
+	Neighborhood=[]	
+	lines=0
+	for line in Dna:
+		lines+=1
+		for i in range(len(line)-k+1):
+			Neighborhood+=(Neighbors(line[i:i+k],d))	
+	Neighborhood=list(set(Neighborhood))
+	for neighbor in Neighborhood:		
+		for line in Dna:			
+			if ApproximatePatternCount(line,neighbor,d)>0:
+				Patterns[PatternToNumber(neighbor)]+=1
+	return [NumberToPattern(i,k) for i in range(len(Patterns)) if Patterns[i]>=lines]
+
+k=5
+d=1
+Dna=["GCGGCTCGTGATATTGCTTATTCGA","GGATACGGCATTCGAAGCGGTGAGG","TTTTCTTTGAAAAGCACTTTAGGCC","TTCGACTCCCGATGTGGCCATGAGA","AGTAGTCTCATTAGAAACTCACTAT","TGGGCGCGGGTTAGAAGGAGGTCAT"]
+
+print " ".join(MotifEnumeration(Dna,k,d))
 
