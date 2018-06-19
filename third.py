@@ -16,6 +16,16 @@ def Pr(Text,Profile):
 		multi *= Profile[Text[i]][i]
 	return multi
 
+
+profile = {'A':[0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.9, 0.1, 0.1, 0.1, 0.3, 0.0],
+'C':[0.1, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.1, 0.2, 0.4, 0.6],
+'G':[0.0, 0.0, 1.0, 1.0, 0.9, 0.9, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
+'T':[0.7, 0.2, 0.0, 0.0, 0.1, 0.1, 0.0, 0.5, 0.8, 0.7, 0.3, 0.4]
+}
+print Pr("TCGTGGATTTCC",profile)
+
+
+
 def ProfileMostProbableKmer(text, k, profile):
 	kmer = ""
 	maximum = -1    
@@ -62,6 +72,7 @@ def Score(Motifs):
 				score+=1
 	return score
 
+
 def GreedyMotifSearch(Dna, k, t):
 	# type your GreedyMotifSearch code here.
 	#It creates a matrix with the first nucleotides of each string    
@@ -87,31 +98,18 @@ def GreedyMotifSearch(Dna, k, t):
 # "CACGTCAATCAC", 
 # "CAATAATATTCG"
 # ],3,5))
-import math
-profile = [[0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.9, 0.1, 0.1, 0.1, 0.3, 0.0],
-	[0.1, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.1, 0.2, 0.4, 0.6],
-	[0.0, 0.0, 1.0, 1.0, 0.9, 0.9, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
-	[0.7, 0.2, 0.0, 0.0, 0.1, 0.1, 0.0, 0.5, 0.8, 0.7, 0.3, 0.4]]
+# import math
+# profile= [[0.2, 0.2, 0, 0, 0, 0, 0.8999999999999999, 0.1, 0.1, 0.1, 0.30000000000000004, 0],
+# [0.1, 0.6, 0, 0, 0, 0, 0, 0.4, 0.1, 0.2, 0.4, 0.6],
+# [0.7, 0.2, 0, 0, 0.1, 0.1, 0, 0.5, 0.7999999999999999, 0.7, 0.30000000000000004, 0.4],
+# [0, 0, 0.9999999999999999, 0.9999999999999999, 0.8999999999999999, 0.8999999999999999, 0.1, 0, 0, 0, 0, 0]]
+# entropy = 0
+# for j in range(len(profile[0])): #colums
+# 	colEntropy = 0
+# 	for i in range(len(profile)): #row
+# 		if profile[i][j]!=0:
+# 			colEntropy+=profile[i][j]*math.log(profile[i][j],2)
+# 	entropy-=colEntropy
 
-entropy = 0
-print len(profile)
-for j in range(len(profile[0])): #colums
-	colEntropy = 0
-	for i in range(len(profile)): #row
-		if profile[i][j]!=0:
-			colEntropy+=profile[i][j]*math.log(profile[i][j],2)
-	entropy-=colEntropy
+# print "Entropy: ",entropy
 
-print entropy
-
-
-CCU CGU ACU GAU AUU AAU
-P     R  T    D 
-
-CCG AGG ACC GAA AUC AAC
-P    R   T   E   I   N
-CCC CGU ACG GAG AUG AAA
-P    R   T   E   M   K
-
-CCC AGG ACU GAG AUC AAU
-P    R   T   E   I   N

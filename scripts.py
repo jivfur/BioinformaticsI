@@ -337,9 +337,53 @@ def MotifEnumeration(Dna,k,d):
 				Patterns[PatternToNumber(neighbor)]+=1
 	return [NumberToPattern(i,k) for i in range(len(Patterns)) if Patterns[i]>=lines]
 
-k=5
-d=1
-Dna=["GCGGCTCGTGATATTGCTTATTCGA","GGATACGGCATTCGAAGCGGTGAGG","TTTTCTTTGAAAAGCACTTTAGGCC","TTCGACTCCCGATGTGGCCATGAGA","AGTAGTCTCATTAGAAACTCACTAT","TGGGCGCGGGTTAGAAGGAGGTCAT"]
 
-print " ".join(MotifEnumeration(Dna,k,d))
 
+
+
+def DistanceBetweenPatternAndStrings(Pattern, Dna):
+	k = len(Pattern)
+	distance = 0
+	for line in Dna:
+		hm = 200000
+		for i in range(len(line)-k+1):
+			p = line[i:i+k]
+			hm2=HammingDistance(p,Pattern)
+			if hm > hm2:
+				hm = hm2
+		distance+=hm
+	return distance
+
+
+# file = open("dataset_5164_1.txt","r")
+# Pattern = file.readline().strip()
+# Dna=file.readline().split()
+
+# print Pattern
+# print Dna
+# print DistanceBetweenPatternAndStrings(Pattern,Dna)
+
+
+def MedianString(Dna,k):
+	distance = 100000
+	for i in range(4**k):
+		Pattern = NumberToPattern(i,k)
+		d = DistanceBetweenPatternAndStrings(Pattern,Dna)
+		if distance > d:
+			median = Pattern
+			distance = d
+	return median
+
+k= 6
+Dna = ["AGCAAGGCGAGAGATAAGAAGGAGGGAGGTTAGACTTAGGCT",
+"GCCTTCACGAGATGTGTAGCGATATTGAGATGTCGGCGGGTT",
+"CTGCTCGCTTCGGAACAAGCGACACAATATTCTGGGTCTGCC",
+"GCGAAAAAAACTAGATCGCGGTTATGCTGTGCCTGTAGGCTT",
+"GCGAGATTATAACAAAGAGGAATGTTTTTCGGTGCCCAAGAC",
+"GCGAAAGAAACTTCCTTCTACATCAAGGGCGGCTGCGCCAGC",
+"GCGACATGACAAGAATCATAACCACTATTGACGCCAAAGGTT",
+"ACGCCCTATGTGTATAGCGCGACAAGCGGCATGATACCGCTG",
+"GCGAGACGACTGAAAAACTTTCGCGCCCTCCTCTTTTAGGGA",
+"TGCCGAGGATGCCAACTCTAGAAAACGAAAGCGATACTCCGA"]
+
+print MedianString(Dna,k)
