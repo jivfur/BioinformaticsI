@@ -34,8 +34,10 @@ def ProfileMostProbableKmer(text, k, profile):
 		if(maximum<pr):
 			maximum = pr
 			kmer = text[i:i+k]    
-
 	return kmer
+
+
+
 # Copy your Consensus(Motifs) function here.
 def Consensus(Motifs):
 	t = len(Motifs)
@@ -53,11 +55,9 @@ def Consensus(Motifs):
 def Profile(Motifs):	
 	t = len(Motifs)
 	k = len(Motifs[0])
-	profile = {}	
+	profile = {"A":[0]*k,"C":[0]*k,"G":[0]*k,"T":[0]*k}
 	for i in range(t):		
-		for j in range(k):
-			if not(Motifs[i][j] in profile):
-				profile[Motifs[i][j]]=[0]*k
+		for j in range(k):			
 			profile[Motifs[i][j]][j]+=1.0/t
 	return profile
 # Input:  A set of k-mers Motifs

@@ -386,4 +386,104 @@ Dna = ["AGCAAGGCGAGAGATAAGAAGGAGGGAGGTTAGACTTAGGCT",
 "GCGAGACGACTGAAAAACTTTCGCGCCCTCCTCTTTTAGGGA",
 "TGCCGAGGATGCCAACTCTAGAAAACGAAAGCGATACTCCGA"]
 
-print MedianString(Dna,k)
+# print MedianString(Dna,k)
+
+
+def Pr(Text,Profile):
+	multi = 1
+	for i in range(len(Text)):		
+		multi *= Profile[Text[i]][i]
+	return multi
+
+
+def ProfileMostProbableKmer(text, k, profile):
+	kmer = ""
+	maximum = -1    
+	for i in range(len(text)-k+1):
+		pr = Pr(text[i:i+k],profile)
+		if(maximum<pr):
+			maximum = pr
+			kmer = text[i:i+k]    
+	return kmer
+
+
+text="TACCTCCCGGGGTTCCATCTCACCATCACGCCCCGTCCTACGCGGTAGAACGACGCAGTGTGGCCCCTATCGTCGAGTCTCGGCCTCTATGATCGTTACTAAGCCGAGGAGGGCGCATGGACGCTGAGCACGTCAACACCTACCATGTCGGCCGGTACTCACGCACTACATCCGAGACCTTTGTACCGTACTTCAAAACGTTTACGTTGGTCTGCTGATGGGCTAAAATTCAGTGGTGCCATTACACTCCGATCGGCCCGTTAGATCCCCCAGAATCTGATCTTAGTAGTGCTTCACCGCCTCGACCCTACTCGGGGCGTATAGTCCTGTACCCACCCCCTTACAACAGACAATAGACCGGGCACAAGTCGAGTGAGATAAAGACCCCACGGGAGTGTTCGTAATGTTGGCAGCCTTCTTCGGTTAAATGACAAATATGCATACCATTTGTGTTAGTAAATATAAGAGGGGTCCTAATTCTCGCCGAGTTGAACTCATGAATACCACGTGAAGCGTTATTCCGGAAAGATTCTAGGATCTCGAAACTTGTACGCTGCTCTCTAATGAACCGATGCGGCCTACGATGATTACAAACCCTCGCACACAATTGCTTACTATCGCCTCTCAGGTCCAGAACGGTAGCTAACAGTCGGATGGCGCTCTATTAAACAAGTTCAGACTTGAAGGCCCACAGCCCGGGCTTAACGTTACTCCCATGAGCATGCGTGTAGCACGACACGTGCGTGCTACAATTTCCCCAAAGATATTTATCCTGGTTAGGCATGCAGTTTTATCGACCACTAGCCCGACATCCAATCTATATCTGCAATTTCTAGCCAGGTCGTTTTAGAAGCGAGCGTATTAGCGACTAGCGGATAACCTGCTTTGACTGGTTCTATCCCCAAAGAGTCAGACATAGTCGCATCAAACCTGCAAGAAAGTTGTCCACATTGTCGTCCATGAGCTACGGGTCCGATCTCTGAATATCTGAGCGTGTAAC"
+k=12
+profile={"A": [0.325,0.277,0.205,0.313,0.289,0.253,0.373,0.289,0.325,0.241,0.229,0.229],
+"C":[0.217,0.313,0.325,0.193,0.229,0.277,0.241,0.217,0.253,0.277,0.217,0.241],
+"G":[0.253,0.169,0.193,0.289,0.253,0.217,0.229,0.145,0.205,0.253,0.229,0.313],
+"T":[0.205,0.241,0.277,0.205,0.229,0.253,0.157,0.349,0.217,0.229,0.325,0.217]}
+
+# print ProfileMostProbableKmer(text,k,profile)
+
+
+
+# Copy your Consensus(Motifs) function here.
+def Consensus(Motifs):
+	t = len(Motifs)
+	k = len(Motifs[0])
+	profile = Profile(Motifs)
+	consensus = [""]*k	
+	for i in range(k):
+		maximum = -1
+		for key in profile:			
+			if maximum< profile[key][i]:
+				consensus[i] = key
+				maximum = profile[key][i]
+	return "".join(consensus)
+# Copy your Count(Motifs) function here.
+def Profile(Motifs):	
+	t = len(Motifs)
+	k = len(Motifs[0])
+	profile = {"A":[0]*k,"C":[0]*k,"G":[0]*k,"T":[0]*k}
+	for i in range(t):		
+		for j in range(k):
+			# if not(Motifs[i][j] in profile):
+			# 	profile[Motifs[i][j]]=[0]*k
+			profile[Motifs[i][j]][j]+=1.0/t
+	return profile
+# Input:  A set of k-mers Motifs
+# Output: The score of these k-mers.
+def Score(Motifs):
+	# Insert code here
+	score=0
+	consensus = Consensus(Motifs)	
+	for row in Motifs:
+		for c1,r1 in zip(consensus,row):			
+			if c1!=r1:
+				score+=1
+	return score
+
+
+def GreedyMotifSearch(Dna, k, t):
+	# type your GreedyMotifSearch code here.
+	#It creates a matrix with the first nucleotides of each string    
+	BestMotifs = []     
+	for i in range(0, t):    	
+		BestMotifs.append(Dna[i][0:k])    
+	n = len(Dna[0])
+	for i in range(n-k+1):
+		Motifs = []
+		Motifs.append(Dna[0][i:i+k])        
+		for j in range(1, t):        	        	            
+			P = Profile(Motifs[0:j])
+			Motifs.append(ProfileMostProbableKmer(Dna[j], k, P))
+		if Score(Motifs) < Score(BestMotifs):
+			BestMotifs = Motifs
+	return BestMotifs
+
+
+
+# file = open("dataset_159_5.txt","r")
+# kt=file.readline().split()
+# Dna=[]
+# for line in file:
+# 	Dna.append(line.strip())
+
+# print len(Dna)
+# print " ".join(GreedyMotifSearch(Dna,int(kt[0]),int(kt[1])))
+
+k=3
+t= 5
+Dna=["GGCGTTCAGGCA","AAGAATCAGTCA","CAAGGAGTTCGC","CACGTCAATCAC","CAATAATATTCG"]
+print " ".join(GreedyMotifSearchWithPseudocounts(Dna,k,t,1))

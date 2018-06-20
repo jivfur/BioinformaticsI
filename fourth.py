@@ -1,28 +1,28 @@
-def CountWithPseudocounts(Motifs):
+def CountWithPseudocounts(Motifs,ps):
     t = len(Motifs)
     k = len(Motifs[0])
     # insert your code here
-    count = {"A":[1]*k,"C":[1]*k,"G":[1]*k,"T":[1]*k}
+    count = {"A":[ps]*k,"C":[ps]*k,"G":[ps]*k,"T":[ps]*k}
 	# # your code here	
     for i in range(t):		
         for j in range(k):			
             count[Motifs[i][j]][j]+=1
     return count
 
-def ProfileWithPseudocounts(Motifs):	
+def ProfileWithPseudocounts(Motifs,ps):	
 	t = len(Motifs)
 	k = len(Motifs[0])	
 	#profile = {}	
-	count = CountWithPseudocounts(Motifs)	
+	count = CountWithPseudocounts(Motifs,ps)	
 	profile={}
 	for key in count:
-		profile[key]= [x / (4.0+t) for x in count[key]]
+		profile[key]= [x / (4.0*ps+t) for x in count[key]]
 	return profile
 
-def Consensus(Motifs):
+def Consensus(Motifs,ps):
 	t = len(Motifs)
 	k = len(Motifs[0])
-	profile = ProfileWithPseudocounts(Motifs)
+	profile = ProfileWithPseudocounts(Motifs,ps)
 	consensus = [""]*k	
 	for i in range(k):
 		maximum = -1
@@ -32,10 +32,10 @@ def Consensus(Motifs):
 				maximum = profile[key][i]
 	return "".join(consensus)
 
-def Score(Motifs):
+def Score(Motifs,ps):
 	# Insert code here
 	score=0
-	consensus = Consensus(Motifs)	
+	consensus = Consensus(Motifs,ps)	
 	for row in Motifs:
 		for c1,r1 in zip(consensus,row):			
 			if c1!=r1:
@@ -61,7 +61,7 @@ def ProfileMostProbableKmer(text, k, profile):
 
 	return kmer
 
-def GreedyMotifSearchWithPseudocounts(Dna, k, t):
+def GreedyMotifSearchWithPseudocounts(Dna, k, t, ps):
 	# type your GreedyMotifSearch code here.
 	#It creates a matrix with the first nucleotides of each string    
 	BestMotifs = []     
@@ -72,17 +72,19 @@ def GreedyMotifSearchWithPseudocounts(Dna, k, t):
 		Motifs = []
 		Motifs.append(Dna[0][i:i+k])        
 		for j in range(1, t):        	        	            
-			P = ProfileWithPseudocounts(Motifs[0:j])
+			P = ProfileWithPseudocounts(Motifs[0:j],ps)
 			Motifs.append(ProfileMostProbableKmer(Dna[j], k, P))
-		if Score(Motifs) < Score(BestMotifs):
+		if Score(Motifs,ps) < Score(BestMotifs,ps):
 			BestMotifs = Motifs
 	return BestMotifs
 
-print  GreedyMotifSearchWithPseudocounts(["GGCGTTCAGGCA","AAGAATCAGTCA","CAAGGAGTTCGC","CACGTCAATCAC","CAATAATATTCG"],3,5)
-# Your output:
-# {'A': [0.2222222222222222, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.2222222222222222, 0.3333333333333333], 
-# 'C': [0.5555555555555556, 0.3333333333333333, 0.2222222222222222, 0.5555555555555556, 0.3333333333333333, 0.5555555555555556, 0.3333333333333333, 0.5555555555555556, 0.3333333333333333], 
-# 'G': [0.3333333333333333, 0.3333333333333333, 0.2222222222222222, 0.2222222222222222, 0.2222222222222222, 0.2222222222222222], 
-# 'T': [0.5555555555555556, 0.5555555555555556, 0.3333333333333333, 0.5555555555555556, 0.3333333333333333, 0.2222222222222222, 0.5555555555555556, 0.2222222222222222, 0.2222222222222222]}
-# Correct output:
-# {'A': [0.2222222222222222, 0.3333333333333333, 0.2222222222222222, 0.1111111111111111, 0.1111111111111111, 0.3333333333333333], 'C': [0.3333333333333333, 0.2222222222222222, 0.5555555555555556, 0.3333333333333333, 0.1111111111111111, 0.1111111111111111], 'G': [0.2222222222222222, 0.2222222222222222, 0.1111111111111111, 0.3333333333333333, 0.2222222222222222, 0.2222222222222222], 'T': [0.2222222222222222, 0.2222222222222222, 0.1111111111111111, 0.2222222222222222, 0.5555555555555556, 0.3333333333333333]}
+
+file = open("dataset_160_9.txt","r")
+kt=file.readline().split()
+Dna=[]
+for line in file:
+	Dna.append(line.strip())
+
+print len(Dna)
+
+print " ".join(GreedyMotifSearchWithPseudocounts(Dna,int(kt[0]),int(kt[1]),1))
