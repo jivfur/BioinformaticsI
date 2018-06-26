@@ -366,27 +366,23 @@ def DistanceBetweenPatternAndStrings(Pattern, Dna):
 
 def MedianString(Dna,k):
 	distance = 100000
+	median=[]
 	for i in range(4**k):
 		Pattern = NumberToPattern(i,k)
 		d = DistanceBetweenPatternAndStrings(Pattern,Dna)
 		if distance > d:
-			median = Pattern
+			median = [Pattern]
 			distance = d
+		elif distance==d:
+			median.append(Pattern)
 	return median
 
-k= 6
-Dna = ["AGCAAGGCGAGAGATAAGAAGGAGGGAGGTTAGACTTAGGCT",
-"GCCTTCACGAGATGTGTAGCGATATTGAGATGTCGGCGGGTT",
-"CTGCTCGCTTCGGAACAAGCGACACAATATTCTGGGTCTGCC",
-"GCGAAAAAAACTAGATCGCGGTTATGCTGTGCCTGTAGGCTT",
-"GCGAGATTATAACAAAGAGGAATGTTTTTCGGTGCCCAAGAC",
-"GCGAAAGAAACTTCCTTCTACATCAAGGGCGGCTGCGCCAGC",
-"GCGACATGACAAGAATCATAACCACTATTGACGCCAAAGGTT",
-"ACGCCCTATGTGTATAGCGCGACAAGCGGCATGATACCGCTG",
-"GCGAGACGACTGAAAAACTTTCGCGCCCTCCTCTTTTAGGGA",
-"TGCCGAGGATGCCAACTCTAGAAAACGAAAGCGATACTCCGA"]
+k= 7
+Dna = ["CTCGATGAGTAGGAAAGTAGTTTCACTGGGCGAACCACCCCGGCGCTAATCCTAGTGCCC",
+"GCAATCCTACCCGAGGCCACATATCAGTAGGAACTAGAACCACCACGGGTGGCTAGTTTC",
+"GGTGTTGAACCACGGGGTTAGTTTCATCTATTGTAGGAATCGGCTTCAAATCCTACACAG"]
 
-# print MedianString(Dna,k)
+print "MediaString: ",MedianString(Dna,k)
 
 
 def Pr(Text,Profile):
@@ -395,6 +391,10 @@ def Pr(Text,Profile):
 		multi *= Profile[Text[i]][i]
 	return multi
 
+
+Profile={"A": [0.4, 0.3, 0.0, 0.1, 0.0, 0.9],"C": [0.2, 0.3, 0.0, 0.4, 0.0, 0.1],"G": [0.1, 0.3, 1.0, 0.1, 0.5, 0.0],"T": [0.3, 0.1, 0.0, 0.4, 0.5, 0.0]}
+
+print "Pr( Pr(TCGGTA|Profile): ", Pr("TCGGTA",Profile)
 
 def ProfileMostProbableKmer(text, k, profile):
 	kmer = ""
@@ -483,7 +483,7 @@ def GreedyMotifSearch(Dna, k, t):
 # print len(Dna)
 # print " ".join(GreedyMotifSearch(Dna,int(kt[0]),int(kt[1])))
 
-k=3
-t= 5
-Dna=["GGCGTTCAGGCA","AAGAATCAGTCA","CAAGGAGTTCGC","CACGTCAATCAC","CAATAATATTCG"]
-print " ".join(GreedyMotifSearchWithPseudocounts(Dna,k,t,1))
+# k=3
+# t= 5
+# Dna=["GGCGTTCAGGCA","AAGAATCAGTCA","CAAGGAGTTCGC","CACGTCAATCAC","CAATAATATTCG"]
+# print " ".join(GreedyMotifSearchWithPseudocounts(Dna,k,t,1))

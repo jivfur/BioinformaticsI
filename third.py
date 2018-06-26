@@ -22,7 +22,7 @@ profile = {'A':[0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.9, 0.1, 0.1, 0.1, 0.3, 0.0],
 'G':[0.0, 0.0, 1.0, 1.0, 0.9, 0.9, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
 'T':[0.7, 0.2, 0.0, 0.0, 0.1, 0.1, 0.0, 0.5, 0.8, 0.7, 0.3, 0.4]
 }
-print Pr("TCGTGGATTTCC",profile)
+
 
 
 
@@ -112,4 +112,24 @@ def GreedyMotifSearch(Dna, k, t):
 # 	entropy-=colEntropy
 
 # print "Entropy: ",entropy
+
+import math
+def Entropy(P):
+	e =0
+	P = [x for x in P if x!=0]
+	for x in P:
+		e+=x*math.log(x,2)
+	return e
+
+A= [0.5, 0, 0, 0.5]
+B= [0.25, 0.25, 0.25, 0.25]
+C= [0, 0, 0, 1]
+D= [0.25, 0, 0.5, 0.25]
+
+print "A:",Entropy(A)
+print "B:",Entropy(B)
+print "C:",Entropy(C)
+print "D:",Entropy(D)
+
+
 
