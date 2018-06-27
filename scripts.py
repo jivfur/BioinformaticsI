@@ -455,13 +455,13 @@ def Motifs(Profile, Dna):
 	return [ProfileMostProbableKmer(text,len(Profile["A"]),Profile) for text in Dna]
 
 
-# def RandomMotifs(k,t):	
-# 	limit = 4**k-1
-# 	return [NumberToPattern(random.randint(0,limit),k) for i in range(t)]
+def RandomMotifs(Dna,k,t):	
+	limit = 4**k-1
+	return [NumberToPattern(random.randint(0,limit),k) for i in range(t)]
 
 
-def RandomMotifs(Dna, k, t):
-	return [text[random.randint(0,len(text)-k):][:k] for text in Dna ]
+# def RandomMotifs(Dna, k, t):
+# 	return [text[random.randint(0,len(text)-k):][:k] for text in Dna ]
 
 def RandomizedMotifSearch(Dna, k, t):
 	# insert your code here
@@ -503,13 +503,14 @@ def thousandTimes(Dna,k,t):
 def Normalize(Probabilities):
 	return {key : Probabilities[key] / sum(Probabilities.values()) for key in Probabilities}
 
+import operator
 
-def WeightedDie(Probabilities):	
+def WeightedDice(Probabilities):	
 	prob = random.uniform(0,1)
-	a =0
+	a =0		
 	for item in Probabilities:		
 		a += Probabilities[item]
-		if a>prob:
+		if a>=prob:
 			return item
 
 
@@ -519,8 +520,16 @@ def ProfileGeneratedString(Text, profile, k):
 	for i in range(0,n-k+1):
 		probabilities[Text[i:i+k]] = Pr(Text[i:i+k], profile)
 	probabilities = Normalize(probabilities)	
-	return WeightedDie(probabilities)
+	return WeightedDice(probabilities)
 
+
+def minProb(Motifs):
+	profile = ProfileWithPseudocounts(Motifs)
+	prob = [Pr(x,profile) for x in Motifs]
+	pos = prob.index(min(prob))
+	# print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	# print prob, pos
+	return pos
 
 
 def GibbsSampler(Dna, k, t, N):
@@ -528,37 +537,74 @@ def GibbsSampler(Dna, k, t, N):
 	# your code here
 	Motifs = RandomMotifs(Dna,k,t)
 	BestMotifs = Motifs
+	score_BM = Score(BestMotifs)
+	# print "==========================================================="
+	# print BestMotifs,score_BM	
 	for j in range(N):		
-		i = random.randint(0,t-1)				
+		# i = random.randint(0,t-1)
+		i= minProb(Motifs)
 		Motifsi= Motifs[:i]+Motifs[i+1:]		
 		Profile = ProfileWithPseudocounts(Motifsi)				
 		Motifs[i] = ProfileGeneratedString(Dna[i],Profile,k)		
-		if Score(Motifs)<Score(BestMotifs):			
+		score_M=Score(Motifs)
+		# print Motifs,score_M
+		if score_M<score_BM:			
 			BestMotifs=Motifs
+			score_BM=score_M
 	return BestMotifs
 
 
 
-# ktN=[8, 5, 100]
-# Dna=["CGCCCCTCTCGGGGGTGTTCAGTAACCGGCCA","GGGCGAGGTATGTGTAAGTGCCAAGGTGCCAG","TAGTACCGAGACCGAAAGAAGTATACAGGCGT","TAGATCAAGTTTCAGGTGCACGTCGGTGAACC","AATCCACCAGCTCCACGTGCAATGTTGGCCTA"]
+# k,t,N=[8, 5, 100]
+# Dna=["CGCCCCTCTCGGGGGTGTTCAGTAAACGGCCA",
+# "GGGCGAGGTATGTGTAAGTGCCAAGGTGCCAG",
+# "TAGTACCGAGACCGAAAGAAGTATACAGGCGT",
+# "TAGATCAAGTTTCAGGTGCACGTCGGTGAACC",
+# "AATCCACCAGCTCCACGTGCAATGTTGGCCTA"]
+
+# motif=["TCTCGGGG",
+# "CCAAGGTG",
+# "TACAGGCG",
+# "TTCAGGTG",
+# "TCCACGTG"]
+
+# print Score(motif)
 
 
 def NTimes(times,Dna,k,t,N):
 	BestMotif = RandomizedMotifSearch(Dna,k,t)
 	score = Score(BestMotif)
+	print BestMotif,score	
 	for i in range(times):
 		M = GibbsSampler(Dna,k,t,N)
-		score_M = Score(M)
+		score_M = Score(M)		
+		# print M,score_M
 		if score>score_M:
 			score = score_M
-			BestMotif=M
+			BestMotif=M			
+	# print"=================================================================="
+	print BestMotif,score
 	return BestMotif
 
 
-file = open("dataset_163_4.txt","r")
-k,t,N=[int(x) for x in file.readline().split()]
-Dna=[]
-for line in file:
-	Dna.append(line.strip())
 
-print "\n".join(NTimes(20,Dna,k,t,N))
+
+
+# file = open("dataset_163_4.txt","r")
+# k,t,N=[int(x) for x in file.readline().split()]
+# Dna=[]
+# for line in file:
+# 	Dna.append(line.strip())
+
+# print "\n".join(NTimes(200,Dna,k,t,N))
+
+
+
+Dna=["ATGAGGTC","GCCCTAGA","AAATAGAT","TTGTGCTA"]
+
+Motif=["GTC","CCC","ATA","GCT"]
+k=3
+
+
+ProfileMotif = Profile(Motif)
+print " ".join(Motifs(ProfileMotif,Dna))
