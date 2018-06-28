@@ -1,3 +1,5 @@
+import random
+
 
 def  PatternToNumber(Pattern):
 	SymbolToNumber= { "A":0, "C":1, "G":2,"T":3}
@@ -78,10 +80,6 @@ def PatternMatching(Pattern, Genome):
 	k=len(Pattern)
 	t=len(Genome)
 	return [i for i in range(t-k+1) if Pattern==Genome[i:i+k]]
-
-
-
-
 
 def Skew(Genome):
 	vals = {"A":0,"C":-1, "G":1,"T":0}
@@ -233,68 +231,6 @@ def ComputingFrequentWordsWithMismatches(Text, k, d):
 	for neighbor in Neighborhood:			
 		close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)
 	return close
-# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-# 	close =[0]*(4**k) 	
-# 	closeRev =[0]*(4**k) 	
-# 	Neighborhood=[]
-# 	NeighborhoodRev=[]
-# 	for i in range(len(Text)-k+1):
-# 		Pattern = Text[i:i+k]		
-# 		Neighborhood+=Neighbors(Pattern,d)
-# 		NeighborhoodRev+=Neighbors(ReverseComplement(Pattern),d)
-# 	for i in range(len(Neighborhood)):					
-# 		close[PatternToNumber(Neighborhood[i])]+=ApproximatePatternCount(Text,Neighborhood[i],d)
-# 		closeRev[PatternToNumber(NeighborhoodRev[i])]+=ApproximatePatternCount(Text,NeighborhoodRev[i],d)
-# 	res = [close[i]+closeRev[i] for i in range(len(close))]
-# 	maximum = max(res)		
-# 	return [NumberToPattern(i,k) for i in range(len(res)) if res[i]==maximum]
-
-# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-# 	close =[0]*(4**k) 	
-# 	closeRev =[0]*(4**k) 	
-# 	Neighborhood=[]
-# 	NeighborhoodRev=[]
-# 	for i in range(len(Text)-k+1):
-# 		Pattern = Text[i:i+k]		
-# 		Neighborhood+=Neighbors(Pattern,d)		
-# 	for neighbor in Neighborhood:
-# 		j = PatternToNumber(neighbor)
-# 		close[j]+=ApproximatePatternCount(Text,neighbor,d)		
-# 		NeighborhoodRev=Neighbors(ReverseComplement(neighbor),d)
-		
-# 		if neighbor in NeighborhoodRev:
-# 			NeighborhoodRev.remove(neighbor)
-# 		print NeighborhoodRev
-# 		print"----------------------------------------------------"
-# 		for neighborrev in NeighborhoodRev:
-# 			rev=PatternToNumber(neighborrev)
-# 			close[rev]+=ApproximatePatternCount(Text,neighborrev,d)	
-# 	print len(close)
-# 	print close
-# 	maximum = max(close)		
-# 	return [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
-
-
-# def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):
-# 	close =[0]*(4**k) 	
-# 	# closeRev =[0]*(4**k) 
-# 	for i in range(len(Text)-k+1):		
-# 		Pattern =Text[i:i+k]				
-# 		PatternRev = ReverseComplement(Pattern)
-# 		Neighborhood = Neighbors(Pattern,d)
-# 		for neighbor in Neighborhood:
-# 			close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)		
-# 		Neighborhood = Neighbors(PatternRev,d)
-# 		for neighbor in Neighborhood:
-# 			close[PatternToNumber(neighbor)]+=ApproximatePatternCount(Text,neighbor,d)		
-	
-# 	maximum = max(close)
-# 	vec = [NumberToPattern(i,k) for i in range(len(close)) if close[i]==maximum]
-# 	final=[]		
-# 	for v in vec:
-# 		final.append(v)
-# 		final.append(ReverseComplement(v))
-# 	return sorted(list(set(final)))
 
 
 def FrequentWordsWithMismatchesAndReverseComplements(Text, k, d):		
@@ -487,3 +423,139 @@ def GreedyMotifSearch(Dna, k, t):
 # t= 5
 # Dna=["GGCGTTCAGGCA","AAGAATCAGTCA","CAAGGAGTTCGC","CACGTCAATCAC","CAATAATATTCG"]
 # print " ".join(GreedyMotifSearchWithPseudocounts(Dna,k,t,1))
+
+
+def CountWithPseudocounts(Motifs):
+	t = len(Motifs)
+	k = len(Motifs[0])
+	# insert your code here
+	count = {"A":[1]*k,"C":[1]*k,"G":[1]*k,"T":[1]*k}
+	# # your code here	
+	for i in range(t):		
+		for j in range(k):			
+			count[Motifs[i][j]][j]+=1
+	return count
+
+
+def ProfileWithPseudocounts(Motifs):	
+	t = len(Motifs)
+	k = len(Motifs[0])	
+	#profile = {}	
+	count = CountWithPseudocounts(Motifs)	
+	profile={}
+	for key in count:
+		profile[key]= [x / (4.0+t) for x in count[key]]
+	return profile
+
+def Motifs(Profile, Dna):
+	return [ProfileMostProbableKmer(text,len(Profile["A"]),Profile) for text in Dna]
+
+
+# def RandomMotifs(k,t):	
+# 	limit = 4**k-1
+# 	return [NumberToPattern(random.randint(0,limit),k) for i in range(t)]
+
+
+def RandomMotifs(Dna, k, t):
+	return [text[random.randint(0,len(text)-k):][:k] for text in Dna ]
+
+def RandomizedMotifSearch(Dna, k, t):
+	# insert your code here
+	M = RandomMotifs(Dna,k, t)	
+	BestMotifs = M
+	score=Score(M)
+	# for i in range(1000):
+	while True:
+		Profile = ProfileWithPseudocounts(M)		
+		M = Motifs(Profile, Dna)		
+		score_BM = Score(M)
+		if score>score_BM:
+			score = score_BM 
+			BestMotifs = M
+		else:
+			return BestMotifs
+
+
+
+def thousandTimes(Dna,k,t):
+	BestMotif = RandomizedMotifSearch(Dna,k,t)
+	score = Score(BestMotif)
+	for i in range(1000):
+		M = RandomizedMotifSearch(Dna,k,t)
+		score_M = Score(M)
+		if score>score_M:
+			score = score_M
+			BestMotif=M
+	return BestMotif
+
+
+
+
+# kt=[8,5]
+# Dna=["CGCCCCTCTCGGGGGTGTTCAGTAAACGGCCA","GGGCGAGGTATGTGTAAGTGCCAAGGTGCCAG","TAGTACCGAGACCGAAAGAAGTATACAGGCGT","TAGATCAAGTTTCAGGTGCACGTCGGTGAACC","AATCCACCAGCTCCACGTGCAATGTTGGCCTA"]
+
+
+# print "\n".join(thousandTimes(Dna,int(kt[0]),int(kt[1])))
+def Normalize(Probabilities):
+	return {key : Probabilities[key] / sum(Probabilities.values()) for key in Probabilities}
+
+
+def WeightedDie(Probabilities):	
+	prob = random.uniform(0,1)
+	a =0
+	for item in Probabilities:		
+		a += Probabilities[item]
+		if a>prob:
+			return item
+
+
+def ProfileGeneratedString(Text, profile, k):
+	n = len(Text)
+	probabilities = {} 
+	for i in range(0,n-k+1):
+		probabilities[Text[i:i+k]] = Pr(Text[i:i+k], profile)
+	probabilities = Normalize(probabilities)	
+	return WeightedDie(probabilities)
+
+
+
+def GibbsSampler(Dna, k, t, N):
+	BestMotifs = [] # output variable
+	# your code here
+	Motifs = RandomMotifs(Dna,k,t)
+	BestMotifs = Motifs
+	for j in range(N):		
+		i = random.randint(0,t-1)				
+		Motifsi= Motifs[:i]+Motifs[i+1:]		
+		Profile = ProfileWithPseudocounts(Motifsi)				
+		Motifs[i] = ProfileGeneratedString(Dna[i],Profile,k)		
+		if Score(Motifs)<Score(BestMotifs):			
+			BestMotifs=Motifs
+	return BestMotifs
+
+
+
+# ktN=[8, 5, 100]
+# Dna=["CGCCCCTCTCGGGGGTGTTCAGTAACCGGCCA","GGGCGAGGTATGTGTAAGTGCCAAGGTGCCAG","TAGTACCGAGACCGAAAGAAGTATACAGGCGT","TAGATCAAGTTTCAGGTGCACGTCGGTGAACC","AATCCACCAGCTCCACGTGCAATGTTGGCCTA"]
+
+
+def NTimes(times,Dna,k,t,N):
+	BestMotif = RandomizedMotifSearch(Dna,k,t)
+	score = Score(BestMotif)
+	for i in range(times):
+		M = GibbsSampler(Dna,k,t,N)
+		score_M = Score(M)
+		if score>score_M:
+			score = score_M
+			BestMotif=M
+	return BestMotif
+
+
+file = open("dataset_163_4.txt","r")
+k,t,N=[int(x) for x in file.readline().split()]
+Dna=[]
+for line in file:
+	Dna.append(line.strip())
+
+print "\n".join(NTimes(20,Dna,k,t,N))
+
