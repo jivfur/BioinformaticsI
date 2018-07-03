@@ -17,8 +17,8 @@ def GenomePath(Dna):
 	return Dna[0]+"".join([Dna[i][-1] for i in range(1,t)])
 
 # if __name__ == "__main__":
-# 	lines = sys.stdin.read().splitlines()
-# 	print(GenomePath(lines))
+#   lines = sys.stdin.read().splitlines()
+#   print(GenomePath(lines))
 
 # Dna=["TCGGGGAATGCATC",
 # "CGGGGAATGCATCA",
@@ -34,9 +34,9 @@ def GenomePath(Dna):
 # "ATCACAAAGTGCAG"]
 
 
-def OverlapGraph(Dna):	
+def OverlapGraph(Dna):  
 	Dict={x:[] for x in Dna}
-	Dna = list(set(Dna))	
+	Dna = list(set(Dna))    
 	t=len(Dna)
 	for i in range(t):
 		for j in range(i+1,t):
@@ -49,29 +49,29 @@ def OverlapGraph(Dna):
 
 def DeBruijnText(k,Text):
 	k-=1
-	kmers = [Text[i:i+k] for i in range(len(Text)-k)]	
-	graph = [(kmers[i],kmers[i+1]) for i in range(len(kmers)-1)]	
+	kmers = [Text[i:i+k] for i in range(len(Text)-k)]   
+	graph = [(kmers[i],kmers[i+1]) for i in range(len(kmers)-1)]    
 	Dna=list(set(kmers))
 	Dict={x:[] for x in Dna}
 	for t in graph:
 		Dict[t[0]].append(t[1]) 
 	return Dict
 
-# def DeBruijn(Patterns):	
-# 	keys=[]
-# 	for Pattern in Patterns:
-# 		keys+=[Pattern[:-1],Pattern[1:]]
-# 	Dict={key:[] for key in keys}
-# 	t=len(keys)
-# 	graph=[]	
-# 	for i in range(t):
-# 		for j in range(i,t):
-# 			if keys[i][1:]==keys[j][0:-1] and keys[i]+keys[j][-1] in Patterns:
-# 				graph.append((keys[i],keys[j]))
-# 				Patterns.remove(keys[i]+keys[j][-1])
-# 	for k,v in graph:
-# 		Dict[k].append(v)
-# 	return Dict
+# def DeBruijn(Patterns):   
+#   keys=[]
+#   for Pattern in Patterns:
+#       keys+=[Pattern[:-1],Pattern[1:]]
+#   Dict={key:[] for key in keys}
+#   t=len(keys)
+#   graph=[]    
+#   for i in range(t):
+#       for j in range(i,t):
+#           if keys[i][1:]==keys[j][0:-1] and keys[i]+keys[j][-1] in Patterns:
+#               graph.append((keys[i],keys[j]))
+#               Patterns.remove(keys[i]+keys[j][-1])
+#   for k,v in graph:
+#       Dict[k].append(v)
+#   return Dict
 
 
 def DeBruijn(Patterns):
@@ -86,12 +86,12 @@ def DeBruijn(Patterns):
 
 
 #Patterns=["GAGG","CAGG","GGGG","GGGA","CAGG","AGGG","GGAG"]
-Patterns = sys.stdin.read().splitlines()
-dict = DeBruijn(Patterns)
-keys = sorted(dict.keys())
-for item in keys:
-	if dict[item]:
-		print(item+" -> "+",".join(dict[item]))
+# Patterns = sys.stdin.read().splitlines()
+# dict = DeBruijn(Patterns)
+# keys = sorted(dict.keys())
+# for item in keys:
+#   if dict[item]:
+#       print(item+" -> "+",".join(dict[item]))
 
 
 # AGG -> GGG
@@ -103,23 +103,23 @@ for item in keys:
 # dict = DeBruijn(2,"TAATGCCATGGGATGTT") 
 # keys = sorted(dict.keys())
 # for item in keys:
-# 	if dict[item]:
-# 		print(item+" -> "+",".join(dict[item]))
+#   if dict[item]:
+#       print(item+" -> "+",".join(dict[item]))
 
 
 # dict = DeBruijn(3,"TAATGCCATGGGATGTT") 
 # keys = sorted(dict.keys())
 # for item in keys:
-# 	if dict[item]:
-# 		print(item+" -> "+",".join(dict[item]))
+#   if dict[item]:
+#       print(item+" -> "+",".join(dict[item]))
 
 
 
 # dict = DeBruijn(4,"TAATGCCATGGGATGTT")
 # keys = sorted(dict.keys())
 # for item in keys:
-# 	if dict[item]:
-# 		print(item+" -> "+",".join(dict[item]))
+#   if dict[item]:
+#       print(item+" -> "+",".join(dict[item]))
 
 
 
@@ -127,24 +127,24 @@ for item in keys:
 
 
 # if __name__ == "__main__":
-# 	k = int(sys.stdin.readline())
-# 	lines = sys.stdin.readline()
-# 	dict = DeBrujin(k,lines)
-# 	keys = sorted(dict.keys())
-# 	for item in keys:
-# 		if dict[item]:
-# 			print(item+" -> "+",".join(dict[item]))
+#   k = int(sys.stdin.readline())
+#   lines = sys.stdin.readline()
+#   dict = DeBrujin(k,lines)
+#   keys = sorted(dict.keys())
+#   for item in keys:
+#       if dict[item]:
+#           print(item+" -> "+",".join(dict[item]))
 
 
 # def compare(file1, file2):
-# 	f1 = open(file1,"r")
-# 	f2 = open(file2,"r")
-# 	index=0
-# 	for l1,l2 in zip(f1,f2):		
-# 		if l1.strip()!=l2.strip():
-# 			print index,l1,l2
-# 			break
-# 		index+=1
+#   f1 = open(file1,"r")
+#   f2 = open(file2,"r")
+#   index=0
+#   for l1,l2 in zip(f1,f2):        
+#       if l1.strip()!=l2.strip():
+#           print index,l1,l2
+#           break
+#       index+=1
 
 
 
@@ -157,12 +157,12 @@ for item in keys:
 
 
 # def kuniversal(k,binary):
-# 	patterns = [binary[i:i+k] for i in range(len(binary)-k+1)]
-# 	list1 = list(set(patterns))
-# 	if len(patterns)!=len(list1):
-# 		print "NO UNIVERSAL"
-# 	else:
-# 		print "UNIVERSAL"
+#   patterns = [binary[i:i+k] for i in range(len(binary)-k+1)]
+#   list1 = list(set(patterns))
+#   if len(patterns)!=len(list1):
+#       print "NO UNIVERSAL"
+#   else:
+#       print "UNIVERSAL"
 
 
 # kuniversal(3,"0100011101")
@@ -171,3 +171,33 @@ for item in keys:
 # kuniversal(3,"1100011011")
 # kuniversal(3,"0111010001")
 # kuniversal(3,"0011101000")
+
+import random
+
+def EurelianCycle(Graph):       
+	stack = [random.choice(Graph.keys())]
+	path = []
+	while stack:		
+		if Graph[stack[0]]:
+			w = random.choice(Graph[stack[0]])
+			Graph[stack[0]].remove(w)
+			stack.insert(0,w)			
+		else:
+			a=stack[0]
+			path.append(stack[0])
+			stack.remove(a)	
+	path.reverse()
+	return path
+
+
+
+# graph = {0:[3],1:[0],2:[1,6],3:[2],4:[2],5:[4],6:[5,8],7:[9],8:[7],9:[6]}
+
+
+graph = {}
+lines = sys.stdin.read().splitlines() # read in the input from STDIN
+for i in xrange(len(lines)):
+	line = lines[i].split("->")
+	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
+
+print "->".join([str(x) for x in EurelianCycle(graph)])
