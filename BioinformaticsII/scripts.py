@@ -194,10 +194,57 @@ def EurelianCycle(Graph):
 # graph = {0:[3],1:[0],2:[1,6],3:[2],4:[2],5:[4],6:[5,8],7:[9],8:[7],9:[6]}
 
 
-graph = {}
-lines = sys.stdin.read().splitlines() # read in the input from STDIN
-for i in xrange(len(lines)):
-	line = lines[i].split("->")
-	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
 
-print "->".join([str(x) for x in EurelianCycle(graph)])
+
+
+# graph = {}
+# lines = sys.stdin.read().splitlines() # read in the input from STDIN
+# for i in xrange(len(lines)):
+# 	line = lines[i].split("->")
+# 	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
+
+
+graph = {0: [2],
+1 : [3],
+2 : [1],
+3 : [0,4],
+6 : [3,7],
+7 : [8],
+8 : [9],
+9 : [6]}
+
+# print "->".join([str(x) for x in EurelianCycle(graph)])
+
+
+def indegree(Graph):
+	nodes = {}
+	for item in Graph:
+		for node in Graph[item]:
+			if not(node in nodes):
+				nodes[node]=0		
+			nodes[node]+=1
+	return nodes
+
+def EulerianPath(Graph):
+	indegrees = indegree(Graph)
+	InKeys = set(indegrees.keys())
+	GraphKeys = set(Graph.keys())
+	diff = InKeys^GraphKeys
+	for k in diff:
+		Graph[k]=[]	
+	unbalancedNodes=[]
+	for item in Graph:
+		if len(Graph[item]) != indegrees[item]:
+			unbalancedNodes.append(item)
+	for node in unbalancedNodes:
+		Graph[node]+=unbalancedNodes
+		Graph[node].remove(node)
+	##remove added edges
+	return EurelianCycle(Graph)
+
+
+print "->".join([str(x) for x in EulerianPath(graph)])
+
+
+# 6->7->8->9->6->3->0->2->1->3->4
+# 9->6->7->8->9->3->0->2->1->3->4
