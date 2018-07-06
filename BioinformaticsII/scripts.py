@@ -208,35 +208,69 @@ graph = {0: [2],
 # print "->".join([str(x) for x in EurelianCycle(graph)])
 
 
-def indegree(Graph):
-	nodes = {}
-	for item in Graph:
-		for node in Graph[item]:
-			if not(node in nodes):
-				nodes[node]=0		
-			nodes[node]+=1
-	return nodes
+# def EulerianPath(Graph):
+# 	indegrees = indegree(Graph)
+# 	InKeys = set(indegrees.keys())
+# 	GraphKeys = set(Graph.keys())
+# 	diff = InKeys^GraphKeys
+# 	for k in diff:
+# 		Graph[k]=[]	
+# 	unbalancedNodes=[]
+# 	for item in Graph:
+# 		if len(Graph[item]) != indegrees[item]:
+# 			unbalancedNodes.append(item)
+# 	for node in unbalancedNodes:
+# 		Graph[node]+=unbalancedNodes
+# 		Graph[node].remove(node)
+# 	##remove added edges
+# 	return EurelianCycle(Graph)
 
-def EulerianPath(Graph):
+def inoutdegree(Graph):
 	indegrees = indegree(Graph)
 	InKeys = set(indegrees.keys())
 	GraphKeys = set(Graph.keys())
 	diff = InKeys^GraphKeys
 	for k in diff:
 		Graph[k]=[]	
-	unbalancedNodes=[]
+	nodes={}
 	for item in Graph:
-		if len(Graph[item]) != indegrees[item]:
-			unbalancedNodes.append(item)
-	for node in unbalancedNodes:
-		Graph[node]+=unbalancedNodes
-		Graph[node].remove(node)
-	##remove added edges
-	return EurelianCycle(Graph)
+		print item
+		nodes[item]=(indegrees[item],len(Graph[item]),indegrees[item]==len(Graph[item]))
+	return nodes
+
+def indegree(Graph):
+	nodes = {}
+	for item in Graph:
+		for node in Graph[item]:
+			print node
+			if not(node in nodes):
+				nodes[node]=0		
+			nodes[node]+=1
+	return nodes
 
 
-print "->".join([str(x) for x in EulerianPath(graph)])
 
-# 6->7->8->9->6->3->0->2->1->3->4
-# 9->6->7->8->9->3->0->2->1->3->4
+def EurelianPath(Graph):       
+	degrees = inoutdegree(Graph)	
+	start = [x for x in degrees if degrees[x][1]>0 and degrees[x][2]==False]	
+	stack = [random.choice(start)]
+	print stack
+	path = []
+	while stack:		
+		if Graph[stack[0]]:
+			w = random.choice(Graph[stack[0]])
+			Graph[stack[0]].remove(w)
+			stack.insert(0,w)			
+		else:
+			a=stack[0]
+			path.append(stack[0])
+			stack.remove(a)	
+	path.reverse()
+	return path
 
+graph = {}
+lines = sys.stdin.read().splitlines() # read in the input from STDIN
+for i in xrange(len(lines)):
+	line = lines[i].split("->")
+	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
+print "->".join([str(x) for x in EurelianPath(graph)])
