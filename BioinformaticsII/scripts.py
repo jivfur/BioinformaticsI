@@ -233,16 +233,15 @@ def inoutdegree(Graph):
 	for k in diff:
 		Graph[k]=[]	
 	nodes={}
-	for item in Graph:
-		print item
+	for item in Graph:		
 		nodes[item]=(indegrees[item],len(Graph[item]),indegrees[item]==len(Graph[item]))
 	return nodes
 
 def indegree(Graph):
 	nodes = {}
 	for item in Graph:
-		for node in Graph[item]:
-			print node
+		nodes[item]=0
+		for node in Graph[item]:			
 			if not(node in nodes):
 				nodes[node]=0		
 			nodes[node]+=1
@@ -252,9 +251,9 @@ def indegree(Graph):
 
 def EurelianPath(Graph):       
 	degrees = inoutdegree(Graph)	
+	print degrees
 	start = [x for x in degrees if degrees[x][1]>0 and degrees[x][2]==False]	
-	stack = [random.choice(start)]
-	print stack
+	stack = [random.choice(start)]	
 	path = []
 	while stack:		
 		if Graph[stack[0]]:
