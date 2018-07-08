@@ -24,7 +24,6 @@ def GenomePath(Dna):
 # "CATCACAAAGTGCA",
 # "ATCACAAAGTGCAG"]
 
-
 def OverlapGraph(Dna):  
 	Dict={x:[] for x in Dna}
 	Dna = list(set(Dna))    
@@ -36,6 +35,8 @@ def OverlapGraph(Dna):
 			if Dna[j][1:]==Dna[i][0:-1]:
 				Dict[Dna[j]].append(Dna[i])
 	return Dict
+
+
 
 
 def DeBruijnText(k,Text):
@@ -186,7 +187,7 @@ def EurelianCycle(Graph):
 # graph = {0:[3],1:[0],2:[1,6],3:[2],4:[2],5:[4],6:[5,8],7:[9],8:[7],9:[6]}
 
 
-
+ # 6->8->7->9->6->5->4->2->1->0->3->2->6
 
 
 # graph = {}
@@ -229,9 +230,12 @@ def inoutdegree(Graph):
 	indegrees = indegree(Graph)
 	InKeys = set(indegrees.keys())
 	GraphKeys = set(Graph.keys())
-	diff = InKeys^GraphKeys
+	diff = InKeys-GraphKeys
 	for k in diff:
 		Graph[k]=[]	
+	diff = GraphKeys-InKeys
+	for k in diff:
+		indegrees[k]=0		
 	nodes={}
 	for item in Graph:		
 		nodes[item]=(indegrees[item],len(Graph[item]),indegrees[item]==len(Graph[item]))
@@ -240,19 +244,16 @@ def inoutdegree(Graph):
 def indegree(Graph):
 	nodes = {}
 	for item in Graph:
-		nodes[item]=0
 		for node in Graph[item]:			
 			if not(node in nodes):
 				nodes[node]=0		
 			nodes[node]+=1
 	return nodes
 
-
-
 def EurelianPath(Graph):       
 	degrees = inoutdegree(Graph)	
-	print degrees
-	start = [x for x in degrees if degrees[x][1]>0 and degrees[x][2]==False]	
+	start = [x for x in degrees if (degrees[x][0])==0]
+	end = 	[x for x in degrees if (degrees[x][1])==0]
 	stack = [random.choice(start)]	
 	path = []
 	while stack:		
@@ -267,9 +268,38 @@ def EurelianPath(Graph):
 	path.reverse()
 	return path
 
-graph = {}
-lines = sys.stdin.read().splitlines() # read in the input from STDIN
-for i in xrange(len(lines)):
-	line = lines[i].split("->")
-	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
-print "->".join([str(x) for x in EurelianPath(graph)])
+
+
+def DeBruijn(Patterns):
+	Dict={}
+	for pattern in Patterns:
+		if pattern[:-1] in Dict:
+			Dict[pattern[:-1]]+=[pattern[1:]]
+		else:
+			Dict[pattern[:-1]]=[pattern[1:]]
+	return Dict
+
+def joinEurelianPath(path):
+	text = path[0]
+	for p in path[1:]:
+		text+=p[-1]
+	return text
+Dna =["CTTA",
+     "ACCA",
+     "TACC",
+     "GGCT",
+     "GCTT",
+     "TTAC"]
+
+Patterns = sys.stdin.read().splitlines()
+graph = DeBruijn(Patterns[1:])
+print graph
+path=EurelianPath(graph)
+print(joinEurelianPath(path))
+
+
+# lines = sys.stdin.read().splitlines() # read in the input from STDIN
+# for i in xrange(len(lines)):
+# 	line = lines[i].split("->")
+# 	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
+# print("->".join([str(x) for x in EurelianPath(graph)]))
