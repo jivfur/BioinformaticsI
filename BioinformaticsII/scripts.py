@@ -66,14 +66,14 @@ def DeBruijnText(k,Text):
 #   return Dict
 
 
-def DeBruijn(Patterns):
-	Dict={}
-	for pattern in Patterns:
-		if pattern[:-1] in Dict:
-			Dict[pattern[:-1]]+=[pattern[1:]]
-		else:
-			Dict[pattern[:-1]]=[pattern[1:]]
-	return Dict
+# def DeBruijn(Patterns):
+# 	Dict={}
+# 	for pattern in Patterns:
+# 		if pattern[:-1] in Dict:
+# 			Dict[pattern[:-1]]+=[pattern[1:]]
+# 		else:
+# 			Dict[pattern[:-1]]=[pattern[1:]]
+# 	return Dict
 
 
 
@@ -252,8 +252,7 @@ def indegree(Graph):
 
 def EurelianPath(Graph):       
 	degrees = inoutdegree(Graph)	
-	start = [x for x in degrees if (degrees[x][0])==0]
-	end = 	[x for x in degrees if (degrees[x][1])==0]
+	start = [x for x in degrees if degrees[x][1]-degrees[x][0]==1]
 	stack = [random.choice(start)]	
 	path = []
 	while stack:		
@@ -284,18 +283,18 @@ def joinEurelianPath(path):
 	for p in path[1:]:
 		text+=p[-1]
 	return text
-Dna =["CTTA",
-     "ACCA",
-     "TACC",
-     "GGCT",
-     "GCTT",
-     "TTAC"]
+# Dna =["CTTA",
+#      "ACCA",
+#      "TACC",
+#      "GGCT",
+#      "GCTT",
+#      "TTAC"]
 
-Patterns = sys.stdin.read().splitlines()
-graph = DeBruijn(Patterns[1:])
-print graph
-path=EurelianPath(graph)
-print(joinEurelianPath(path))
+# Patterns = sys.stdin.read().splitlines()
+# graph = DeBruijn(Patterns[1:])
+# print graph
+# path=EurelianPath(graph)
+# print(joinEurelianPath(path))
 
 
 # lines = sys.stdin.read().splitlines() # read in the input from STDIN
@@ -303,3 +302,28 @@ print(joinEurelianPath(path))
 # 	line = lines[i].split("->")
 # 	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
 # print("->".join([str(x) for x in EurelianPath(graph)]))
+
+def circularString(k):
+	b = 2**k
+	Dna=[]
+	cad = "0"*(k)	
+	for i in range(b):
+		a = cad+bin(i)[2:]		
+		Dna.append(a[len(a)-k:])	
+	graph = DeBruijn(Dna)	
+	return EurelianCycle(graph)
+
+def joinEurelianCycle(cycle):
+	print cycle
+	cad=cycle[0]
+	for c in cycle[1:-1]:
+		cad+=c[1:]
+	return cad
+
+
+k = int(sys.stdin.read())
+print joinEurelianCycle(circularString(k))
+
+
+
+
