@@ -315,9 +315,11 @@ def circularString(k):
 
 def joinEurelianCycle(cycle):
 	print cycle
-	cad=cycle[0]
+	cad=cycle[0][0:2]
+	print cad
 	for c in cycle[1:-1]:
 		cad+=c[1:]
+		print cad
 	return cad
 
 
