@@ -278,11 +278,7 @@ def DeBruijn(Patterns):
 			Dict[pattern[:-1]]=[pattern[1:]]
 	return Dict
 
-def joinEurelianPath(path):
-	text = path[0]
-	for p in path[1:]:
-		text+=p[-1]
-	return text
+
 # Dna =["CTTA",
 #      "ACCA",
 #      "TACC",
@@ -303,29 +299,94 @@ def joinEurelianPath(path):
 # 	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
 # print("->".join([str(x) for x in EurelianPath(graph)]))
 
+def joinEurelianPath(path):
+	text = path[0]
+	for p in path[1:]:
+		text+=p[-1]
+	return text
+
 def circularString(k):
 	b = 2**k
 	Dna=[]
 	cad = "0"*(k)	
 	for i in range(b):
 		a = cad+bin(i)[2:]		
-		Dna.append(a[len(a)-k:])	
+		Dna.append(a[len(a)-k:])		
 	graph = DeBruijn(Dna)	
 	return EurelianCycle(graph)
 
-def joinEurelianCycle(cycle):
-	print cycle
-	cad=cycle[0][0:2]
-	print cad
-	for c in cycle[1:-1]:
-		cad+=c[1:]
-		print cad
-	return cad
+def joinCirculaString(cycle,k):	
+	first = "0"*k
+	edges = [cycle[i]+cycle[i+1][-1] for i in range(len(cycle[:-1]))]	
+	index=edges.index(first)
+	edges_sorted=[edges[index]]
+	i=index+1
+	l = len(edges)
+	while edges[i%l]!=first:
+		edges_sorted.append(edges[i%l])
+		i+=1	
+	print len(edges)
+	print edges
+	print len(edges_sorted)
+	print edges_sorted
+	text = edges_sorted[0]
+	for p in edges_sorted[1:-k+1]:
+		text+=p[-1]	
+	return text
+	
+	
+
+# k = int(sys.stdin.read())
+# print joinCirculaString(circularString(k),k)
 
 
-k = int(sys.stdin.read())
-print joinEurelianCycle(circularString(k))
+# def PairedComposition(k,d,text):
+# 	return [(text[i:i+k],text[i+k+d:i+2*k+d]) for i in range(len(text)-(2*k+d)+1)]
+	
+
+# kdmer= PairedComposition(3,2,"TAATGCCATGGGATGTT")
+# cad = []
+# for kd in kdmer:
+# 	cad.append("("+kd[0]+"|"+kd[1]+") ")
+# print "".join(sorted(cad))
+
+# Path=["AG|AG",
+# "AG|TG",
+# "CA|CT",
+# "CT|CA",
+# "CT|CT",
+# "GC|GC",
+# "GC|GC",
+# "GC|GC",
+# "TG|TG"]
+
+def StringSpelledByGappedPatterns(k,d,path):
+	p = [ tuple(kmer.split("|")) for kmer in path]
+	first=[]
+	second=[]
+	for kmer in p:
+		first.append(kmer[0])
+		second.append(kmer[1])
+		prefix=""
+	suffix=""
+	for i in range(len(first)-1):
+		prefix+=first[i][0]
+		suffix+=second[i][0]
+	prefix+=first[-1]
+	suffix+=second[-1]
+	if(prefix[k+d:]!=suffix[:-k-d]):
+		return "there is no string spelled by the gapped patterns"
+	return prefix+suffix[k+d:]
 
 
+
+
+k,d = sys.stdin.readline().split()
+lines=sys.stdin.read().splitlines()
+path=[]
+for i in range(len(lines)):
+	path.append(lines[i])
+
+print(StringSpelledByGappedPatterns(int(k),int(d),path))
 
 
