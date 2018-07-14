@@ -1,4 +1,5 @@
 import sys
+import random
 
 def Composition(k,Text):
 	return sorted([Text[i:i+k] for i in range(len(Text)-k+1)])
@@ -165,7 +166,7 @@ def DeBruijnText(k,Text):
 # kuniversal(3,"0011101000")
 
 
-import random
+
 
 def EurelianCycle(Graph):       
 	stack = [random.choice(Graph.keys())]
@@ -197,14 +198,14 @@ def EurelianCycle(Graph):
 # 	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
 
 
-graph = {0: [2],
-1 : [3],
-2 : [1],
-3 : [0,4],
-6 : [3,7],
-7 : [8],
-8 : [9],
-9 : [6]}
+# graph = {0: [2],
+# 1 : [3],
+# 2 : [1],
+# 3 : [0,4],
+# 6 : [3,7],
+# 7 : [8],
+# 8 : [9],
+# 9 : [6]}
 
 # print "->".join([str(x) for x in EurelianCycle(graph)])
 
@@ -226,46 +227,7 @@ graph = {0: [2],
 # 	##remove added edges
 # 	return EurelianCycle(Graph)
 
-def inoutdegree(Graph):
-	indegrees = indegree(Graph)
-	InKeys = set(indegrees.keys())
-	GraphKeys = set(Graph.keys())
-	diff = InKeys-GraphKeys
-	for k in diff:
-		Graph[k]=[]	
-	diff = GraphKeys-InKeys
-	for k in diff:
-		indegrees[k]=0		
-	nodes={}
-	for item in Graph:		
-		nodes[item]=(indegrees[item],len(Graph[item]),indegrees[item]==len(Graph[item]))
-	return nodes
 
-def indegree(Graph):
-	nodes = {}
-	for item in Graph:
-		for node in Graph[item]:			
-			if not(node in nodes):
-				nodes[node]=0		
-			nodes[node]+=1
-	return nodes
-
-def EurelianPath(Graph):       
-	degrees = inoutdegree(Graph)	
-	start = [x for x in degrees if degrees[x][1]-degrees[x][0]==1]
-	stack = [random.choice(start)]	
-	path = []
-	while stack:		
-		if Graph[stack[0]]:
-			w = random.choice(Graph[stack[0]])
-			Graph[stack[0]].remove(w)
-			stack.insert(0,w)			
-		else:
-			a=stack[0]
-			path.append(stack[0])
-			stack.remove(a)	
-	path.reverse()
-	return path
 
 
 
@@ -359,6 +321,49 @@ def joinCirculaString(cycle,k):
 # "GC|GC",
 # "GC|GC",
 # "TG|TG"]
+
+
+def inoutdegree(Graph):
+	indegrees = indegree(Graph)
+	InKeys = set(indegrees.keys())
+	GraphKeys = set(Graph.keys())
+	diff = InKeys-GraphKeys
+	for k in diff:
+		Graph[k]=[]	
+	diff = GraphKeys-InKeys
+	for k in diff:
+		indegrees[k]=0		
+	nodes={}
+	for item in Graph:		
+		nodes[item]=(indegrees[item],len(Graph[item]),indegrees[item]==len(Graph[item]))
+	return nodes
+
+def indegree(Graph):
+	nodes = {}
+	for item in Graph:
+		for node in Graph[item]:			
+			if not(node in nodes):
+				nodes[node]=0		
+			nodes[node]+=1
+	return nodes
+
+def EurelianPath(Graph):       
+	degrees = inoutdegree(Graph)	
+	start = [x for x in degrees if degrees[x][1]-degrees[x][0]==1]
+	stack = [random.choice(start)]	
+	path = []
+	while stack:		
+		if Graph[stack[0]]:
+			w = random.choice(Graph[stack[0]])
+			Graph[stack[0]].remove(w)
+			stack.insert(0,w)			
+		else:
+			a=stack[0]
+			path.append(stack[0])
+			stack.remove(a)	
+	path.reverse()
+	return path
+
 def StringSpelledByGappedPatterns(k,d,p):
 	# p = [tuple(kmer.split("|")) for kmer in path]	
 	prefix=""
@@ -372,11 +377,56 @@ def StringSpelledByGappedPatterns(k,d,p):
 		return "there is no string spelled by the gapped patterns"	
 	return prefix+suffix[-k-d:]
 
-k,d = sys.stdin.readline().split()
-lines=sys.stdin.read().splitlines()
-path=[]
-for i in range(len(lines)):
-	path.append(tuple(lines[i].strip().split("|")))
-print(StringSpelledByGappedPatterns(int(k),int(d),path))
+def DeBruijnkd(Patterns):
+	graph={p:[] for p in Patterns}
+	for pattern in Patterns:
+		for p2 in Patterns:			
+			if pattern[0][1:]==p2[0][:-1] and pattern[1][1:]==p2[1][:-1]:
+				graph[pattern].append(p2)
+	return graph
 
 
+# k,d = sys.stdin.readline().split()
+# lines=sys.stdin.read().splitlines()
+# path=[]
+# for i in range(len(lines)):
+# 	path.append(tuple(lines[i].strip().split("|")))
+# print(StringSpelledByGappedPatterns(int(k),int(d),EurelianPath(DeBruijnkd(path))))
+
+
+
+def MaximalNonBranchingPaths(graph):
+	path=[]
+		
+	for key in graph:		
+		invout = inoutdegree(graph)
+		if invout[key][0]>0 and not(invout[v][0]==invout[v][1]==1):
+			r=[key]
+			v = graph[key][0]						
+			while invout[v][0]>0:
+				r.append(v)
+				graph[key].remove(v)
+				if not(invout[v][0]==invout[v][1]==1):
+					break				
+				if not(graph[v]):
+					break
+				print r
+				key = v
+				v=graph[v][0]
+			path.append(r)
+	print path
+	print graph
+	return False
+
+
+
+
+
+
+
+graph={}
+lines = sys.stdin.read().splitlines() # read in the input from STDIN
+for i in xrange(len(lines)):
+	line = lines[i].split("->")	
+	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
+MaximalNonBranchingPaths(graph)

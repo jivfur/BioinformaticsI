@@ -1,10 +1,5 @@
-2 1
-AG|AG
-GC|GC
-CA|CT
-AG|TG
-GC|GC
-CT|CT
-TG|TG
-GC|GC
-CT|CA
+1 -> 2
+2 -> 3
+3 -> 4,5
+6 -> 7
+7 -> 6
