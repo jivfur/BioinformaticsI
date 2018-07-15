@@ -1,0 +1,5 @@
+Degrees {('TTC', 'GAA'): (1, 1, True), ('GAA', 'CTT'): (3, 0, False), ('CGA', 'ACT'): (1, 3, False), ('CCG', 'TAC'): (1, 1, True), ('TAC', 'GAT'): (1, 2, False), ('ACC', 'ATA'): (2, 1, False), ('GAT', 'CTG'): (6, 4, False), ('CTG', 'TTC'): (1, 1, True), ('ATA', 'TGA'): (2, 1, False), ('ATT', 'TGA'): (2, 1, False), ('CTG', 'AGC'): (1, 1, True), ('TGA', 'TCT'): (1, 3, False), ('TCT', 'AAG'): (1, 1, True), ('CAC', 'GAT'): (0, 2, False), ('ACT', 'ATT'): (2, 1, False), ('TGA', 'GCT'): (1, 3, False)}
+[('TAC', 'GAT')]
+TACCGGGATTCTGGATACTGGGAAGAA
+GATACCCTGAAGCCTGATTCCCTTCTT
+***************************

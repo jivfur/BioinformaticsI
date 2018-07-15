@@ -231,14 +231,6 @@ def EurelianCycle(Graph):
 
 
 
-def DeBruijn(Patterns):
-	Dict={}
-	for pattern in Patterns:
-		if pattern[:-1] in Dict:
-			Dict[pattern[:-1]]+=[pattern[1:]]
-		else:
-			Dict[pattern[:-1]]=[pattern[1:]]
-	return Dict
 
 
 # Dna =["CTTA",
@@ -347,22 +339,29 @@ def indegree(Graph):
 			nodes[node]+=1
 	return nodes
 
-def EurelianPath(Graph):       
-	degrees = inoutdegree(Graph)	
+def EurelianPath(graph):	
+	degrees = inoutdegree(graph)	
+	print "Degrees",degrees
 	start = [x for x in degrees if degrees[x][1]-degrees[x][0]==1]
-	stack = [random.choice(start)]	
-	path = []
-	while stack:		
-		if Graph[stack[0]]:
-			w = random.choice(Graph[stack[0]])
-			Graph[stack[0]].remove(w)
-			stack.insert(0,w)			
-		else:
-			a=stack[0]
-			path.append(stack[0])
-			stack.remove(a)	
-	path.reverse()
-	return path
+	print start
+	eu=[]
+	for s in start:
+		Graph=copy.deepcopy(graph)
+		stack = [s]	
+		path = []	
+		while stack:		
+			if Graph[stack[0]]:			
+				w = random.choice(Graph[stack[0]])			
+				Graph[stack[0]].remove(w)
+				stack.insert(0,w)			
+			else:
+				a=stack[0]
+				path.append(stack[0])
+				stack.remove(a)	
+		path.reverse()
+		eu.append(path)
+	return eu
+	
 
 def StringSpelledByGappedPatterns(k,d,p):
 	# p = [tuple(kmer.split("|")) for kmer in path]	
@@ -372,61 +371,97 @@ def StringSpelledByGappedPatterns(k,d,p):
 		prefix+=p[i][0][0]
 		suffix+=p[i][1][0]
 	prefix+=p[-1][0]
-	suffix+=p[-1][1]	
+	suffix+=p[-1][1]
+	print prefix
+	print suffix
+	print "***************************"		
 	if(prefix[k+d:]!=suffix[:-k-d]):
-		return "there is no string spelled by the gapped patterns"	
+		return False	
 	return prefix+suffix[-k-d:]
 
 def DeBruijnkd(Patterns):
 	graph={p:[] for p in Patterns}
-	for pattern in Patterns:
+	for pattern in Patterns:		
 		for p2 in Patterns:			
 			if pattern[0][1:]==p2[0][:-1] and pattern[1][1:]==p2[1][:-1]:
 				graph[pattern].append(p2)
 	return graph
 
+import time
+import copy
+random.seed(time.time())
+k,d = sys.stdin.readline().split()
+lines=sys.stdin.read().splitlines()
+path=[]
+for i in range(len(lines)):
+	path.append(tuple(lines[i].strip().split("|")))
+g=DeBruijnkd(path)
+ep=EurelianPath(g)
+a = StringSpelledByGappedPatterns(int(k),int(d),ep[0])
 
-# k,d = sys.stdin.readline().split()
-# lines=sys.stdin.read().splitlines()
-# path=[]
-# for i in range(len(lines)):
-# 	path.append(tuple(lines[i].strip().split("|")))
-# print(StringSpelledByGappedPatterns(int(k),int(d),EurelianPath(DeBruijnkd(path))))
 
 
 
 def MaximalNonBranchingPaths(graph):
-	path=[]
-		
-	for key in graph:		
-		invout = inoutdegree(graph)
-		if invout[key][0]>0 and not(invout[v][0]==invout[v][1]==1):
-			r=[key]
-			v = graph[key][0]						
-			while invout[v][0]>0:
-				r.append(v)
-				graph[key].remove(v)
-				if not(invout[v][0]==invout[v][1]==1):
-					break				
-				if not(graph[v]):
+	MaxPath=[]
+	invout = inoutdegree(graph)	
+	startSymbols = [x for x in invout if invout[x][1]>0 and not(invout[x][0]==invout[x][1]==1)]		
+	for key in startSymbols:			
+		path=[]
+		for k in graph[key]:			
+			path=[key]
+			path.append(k)			
+			while invout[k][0]==invout[k][1]==1:
+				k = graph[k][0]
+				path.append(k)			
+			MaxPath.append(path)
+	
+	#How to identify cycles
+	oneone = [x for x in invout if invout[x][0]==invout[x][1]==1]
+	#find cycles
+	for x in oneone:		
+		for y in graph[x]:
+			path=[x]
+			while y in oneone:
+				path.append(y)
+				oneone.remove(y)
+				if(path[0]==y):
 					break
-				print r
-				key = v
-				v=graph[v][0]
-			path.append(r)
-	print path
-	print graph
-	return False
+				y=graph[y][0]
+			if len(path)>1 and path[0]==y:
+				MaxPath.append(path)		
+	return MaxPath
+
+# graph={}
+# lines = sys.stdin.read().splitlines() # read in the input from STDIN
+# for i in range(len(lines)):
+# 	line = lines[i].split("->")	
+# 	graph[line[0].strip()] = [x.strip() for x in line[1].split(",")]
+# MaxP=MaximalNonBranchingPaths(graph)
+# for m in MaxP:
+# 	print " -> ".join(m)
+
+def DeBruijn(Patterns):
+	Dict={}
+	for pattern in Patterns:
+		if pattern[:-1] in Dict:
+			Dict[pattern[:-1]]+=[pattern[1:]]
+		else:
+			Dict[pattern[:-1]]=[pattern[1:]]
+	return Dict
+
+def joinNonBranchingPath(NonBranching):
+	contings=[]
+	for branch in NonBranching:
+		contings.append(branch[0]+"".join([x[-1] for x in branch[1:]]))
+	return contings
 
 
 
+# Patterns = sys.stdin.read().splitlines()
+# print Patterns
+# graph = DeBruijn(Patterns)
+# print graph
+# print joinEurelianPath(EurelianPath(graph))
 
 
-
-
-graph={}
-lines = sys.stdin.read().splitlines() # read in the input from STDIN
-for i in xrange(len(lines)):
-	line = lines[i].split("->")	
-	graph[int(line[0])] = [int(x) for x in line[1].split(",")]
-MaximalNonBranchingPaths(graph)
