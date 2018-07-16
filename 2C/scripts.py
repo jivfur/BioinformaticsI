@@ -350,7 +350,7 @@ def EurelianPath(graph):
 		stack = [s]	
 		path = []	
 		while stack:		
-			if Graph[stack[0]]:			
+			if Graph[stack[0]]:				
 				w = random.choice(Graph[stack[0]])			
 				Graph[stack[0]].remove(w)
 				stack.insert(0,w)			
@@ -396,6 +396,7 @@ path=[]
 for i in range(len(lines)):
 	path.append(tuple(lines[i].strip().split("|")))
 g=DeBruijnkd(path)
+print g
 ep=EurelianPath(g)
 a = StringSpelledByGappedPatterns(int(k),int(d),ep[0])
 
