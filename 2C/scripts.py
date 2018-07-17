@@ -350,7 +350,7 @@ def EurelianPath(graph):
 		stack = [s]	
 		path = []	
 		while stack:		
-			if Graph[stack[0]]:				
+			if Graph[stack[0]]:
 				w = random.choice(Graph[stack[0]])			
 				Graph[stack[0]].remove(w)
 				stack.insert(0,w)			
@@ -387,18 +387,18 @@ def DeBruijnkd(Patterns):
 				graph[pattern].append(p2)
 	return graph
 
-import time
-import copy
-random.seed(time.time())
-k,d = sys.stdin.readline().split()
-lines=sys.stdin.read().splitlines()
-path=[]
-for i in range(len(lines)):
-	path.append(tuple(lines[i].strip().split("|")))
-g=DeBruijnkd(path)
-print g
-ep=EurelianPath(g)
-a = StringSpelledByGappedPatterns(int(k),int(d),ep[0])
+# import time
+# import copy
+# random.seed(time.time())
+# k,d = sys.stdin.readline().split()
+# lines=sys.stdin.read().splitlines()
+# path=[]
+# for i in range(len(lines)):
+# 	path.append(tuple(lines[i].strip().split("|")))
+# g=DeBruijnkd(path)
+# print g
+# ep=EurelianPath(g)
+# a = StringSpelledByGappedPatterns(int(k),int(d),ep[0])
 
 
 
@@ -456,13 +456,28 @@ def joinNonBranchingPath(NonBranching):
 	for branch in NonBranching:
 		contings.append(branch[0]+"".join([x[-1] for x in branch[1:]]))
 	return contings
-
-
-
 # Patterns = sys.stdin.read().splitlines()
 # print Patterns
 # graph = DeBruijn(Patterns)
 # print graph
 # print joinEurelianPath(EurelianPath(graph))
 
+def loadRNACodonTable(fileName):
+	f = open(fileName,"r")
+	table={}
+	for line in f:
+		l=line.split()
+		if len(l)==1:
+			table[l[0]]=""
+		else:
+			table[l[0]]=l[1]
+	return table
 
+def RNA2Aminoacid(text,table):
+	return "".join([table[text[t:t+3]] for t in range(0,len(text),3)])
+
+
+table=loadRNACodonTable("RNA_codon_table_1.txt")
+text = sys.stdin.read().strip()
+
+print RNA2Aminoacid(text,table)
