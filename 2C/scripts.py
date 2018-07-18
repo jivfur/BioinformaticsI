@@ -477,7 +477,94 @@ def RNA2Aminoacid(text,table):
 	return "".join([table[text[t:t+3]] for t in range(0,len(text),3)])
 
 
-table=loadRNACodonTable("RNA_codon_table_1.txt")
-text = sys.stdin.read().strip()
+# table=loadRNACodonTable("RNA_codon_table_1.txt")
+# text = sys.stdin.read().strip()
 
-print RNA2Aminoacid(text,table)
+# print RNA2Aminoacid(text,table)
+
+def loadRNACodonTable2(fileName):
+	f = open(fileName,"r")
+	table={}
+	table["STOP"]=[]
+	for line in f:
+		l=line.split()
+		if(len(l)==1): #STOP
+			table["STOP"].append(l)
+		else:
+			if not(l[1] in table):
+				table[l[1]]=[]
+			table[l[1]].append(l[0])
+	return table
+
+def complement(kmer):
+	dict={"A":"T","C":"G","G":"C","T":"A"}
+	return "".join([dict[x] for x in kmer])[::-1]
+
+
+import numpy as np
+
+def productoCruz(vec1,vec2):
+	res=[]
+	for v1 in vec1:
+		row=[]
+		for v2 in vec2:
+			row.append(v1+v2)
+		res.append(row)	
+	res = np.reshape(res,len(res)*len(res[0]),1)
+	return res
+
+
+
+def PeptideEncodingProblem(Text,peptide,table):
+	DNAStrings=[]
+	for p in peptide:
+		kmers = table[p]		
+		dna=[]
+		for rna in kmers:
+			dna.append(rna.replace("U","T"))			
+		DNAStrings.append(dna)	
+	filas = len(DNAStrings)	
+	vec1 = np.transpose(DNAStrings[0])
+	for fila in range(1,filas):		
+		vec2 = DNAStrings[fila]
+		vec1=productoCruz(vec1,vec2)
+	vec2 = [complement(v) for v in vec1]
+	vec = vec1.tolist()+vec2	
+	elements=[]
+	for i in range(len(Text)-len(vec[0])):
+		for v in vec:			
+			if v==Text[i:i+len(v)]:
+				elements.append(v)
+	return elements
+
+
+
+
+
+# table=loadRNACodonTable2("RNA_codon_table_1.txt")
+# Text=Patterns = sys.stdin.read().strip()
+# peptide="VKLFPWFNQY"
+
+# print len(PeptideEncodingProblem(Text,peptide,table))
+def loadMass(filename):
+	f = open(filename)
+	dict={}
+	for l in f:
+		l = l.split()
+		dict[l[0]]=int(l[1])
+	return dict
+
+def LinearSpectrum(Peptide,AminoAcidMass):
+	prefimax=[0]
+	for i in range(len(Peptide)):
+			prefimax.append(prefimax[i-1]+AminoAcidMass[peptide[i]])	
+	linear=[0]
+	for i in range(len(Peptide)-1):
+		for j in range(i+1,len(Peptide)):
+			linear.append(prefimax[j]-prefimax[i])
+	print sorted(linear)
+
+
+mass= loadMass("integer_mass_table.txt")
+peptide ="NQEL"
+LinearSpectrum(peptide,mass)
