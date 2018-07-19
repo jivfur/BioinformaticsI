@@ -1,5 +1,6 @@
 import sys
 import random
+import copy
 
 def Composition(k,Text):
 	return sorted([Text[i:i+k] for i in range(len(Text)-k+1)])
@@ -477,10 +478,11 @@ def RNA2Aminoacid(text,table):
 	return "".join([table[text[t:t+3]] for t in range(0,len(text),3)])
 
 
-# table=loadRNACodonTable("RNA_codon_table_1.txt")
-# text = sys.stdin.read().strip()
+table=loadRNACodonTable("RNA_codon_table_1.txt")
 
-# print RNA2Aminoacid(text,table)
+text = sys.stdin.read().splitlines()
+for t in text:
+	print RNA2Aminoacid(t,table)
 
 def loadRNACodonTable2(fileName):
 	f = open(fileName,"r")
@@ -556,15 +558,89 @@ def loadMass(filename):
 
 def LinearSpectrum(Peptide,AminoAcidMass):
 	prefimax=[0]
-	for i in range(len(Peptide)):
-			prefimax.append(prefimax[i-1]+AminoAcidMass[peptide[i]])	
+	for i in range(len(Peptide)):		
+		prefimax.append(prefimax[i]+AminoAcidMass[Peptide[i]])		
 	linear=[0]
-	for i in range(len(Peptide)-1):
-		for j in range(i+1,len(Peptide)):
+	for i in range(len(prefimax)-1):
+		for j in range(i+1,len(prefimax)):			
 			linear.append(prefimax[j]-prefimax[i])
-	print sorted(linear)
+	return sorted(linear)
+	
+def cyclicSpectrum(Peptide,AminoAcidMass):
+	prefimax=[0]
+	lp = len(Peptide)
+	for i in range(lp):		
+		prefimax.append(prefimax[i]+AminoAcidMass[Peptide[i]])		
+	linear=[0]
+	peptideMass=prefimax[lp]	
+	for i in range(len(prefimax)-1):
+		for j in range(i+1,len(prefimax)):			
+			linear.append(prefimax[j]-prefimax[i])
+			if i>0 and j<lp:
+				linear.append(peptideMass-(prefimax[j]-prefimax[i]))
+	return sorted(linear)
 
+
+
+
+#print " ".join([str(x) for x in cyclicSpectrum(peptide,mass)])
+
+
+def Expand(Peptides, mass):
+	Pep2=[]
+	for p in Peptides:
+		for m in mass:
+			Pep2.append(p+m)
+	return Pep2
+
+def calculateMass(peptide,mass):
+	m=0
+	for p in peptide:
+		m+=mass[p]
+	return m
+
+def consistent(linearspec,spectrum):
+	for ls in linearspec:
+		if ls in spectrum:
+			spectrum.remove(ls)
+		else:
+			return False
+	return True
+
+def CyclopeptideSequencing(spectrum,mass):
+	
+	Peptides = [""] #Strings of peptides consistent with spectrum
+	founds=[]
+	while Peptides:
+		Peptides=Expand(Peptides,mass)		
+		Peps = copy.deepcopy(Peptides)
+		for Pep in Peptides:
+			ls=LinearSpectrum(Pep,mass)			
+			if max(ls)==max(spectrum):
+				if cyclicSpectrum(Pep,mass)==spectrum:
+					founds.append(Pep)
+				Peps.remove(Pep)
+			else:
+				if not(consistent(ls,copy.deepcopy(spectrum))):
+					Peps.remove(Pep)
+		Peptides=Peps			
+	return founds
 
 mass= loadMass("integer_mass_table.txt")
-peptide ="NQEL"
-LinearSpectrum(peptide,mass)
+# peps=CyclopeptideSequencing([0,71,101,113,131,184,202,214,232,285,303,315,345,416],mass)
+# print peps
+# cad=""
+# for pep in peps:
+# 	cad+="-".join(str(mass[p]) for p in pep)+" "
+
+# print cad
+
+
+spectrum=[0,71,99,101,103,128,129,199,200,204,227,230,231,298,303,328,330,332,333]
+peps=["CET","TCE","CTV","VAQ","ETC","AQV"]
+for p in peps:
+	ls=LinearSpectrum(p,mass)
+	if consistent(ls,copy.deepcopy(spectrum)):
+		print p
+
+
