@@ -478,11 +478,11 @@ def RNA2Aminoacid(text,table):
 	return "".join([table[text[t:t+3]] for t in range(0,len(text),3)])
 
 
-table=loadRNACodonTable("RNA_codon_table_1.txt")
+# table=loadRNACodonTable("RNA_codon_table_1.txt")
 
-text = sys.stdin.read().splitlines()
-for t in text:
-	print RNA2Aminoacid(t,table)
+# text = sys.stdin.read().splitlines()
+# for t in text:
+# 	print RNA2Aminoacid(t,table)
 
 def loadRNACodonTable2(fileName):
 	f = open(fileName,"r")
@@ -626,7 +626,7 @@ def CyclopeptideSequencing(spectrum,mass):
 		Peptides=Peps			
 	return founds
 
-mass= loadMass("integer_mass_table.txt")
+
 # peps=CyclopeptideSequencing([0,71,101,113,131,184,202,214,232,285,303,315,345,416],mass)
 # print peps
 # cad=""
@@ -636,11 +636,39 @@ mass= loadMass("integer_mass_table.txt")
 # print cad
 
 
-spectrum=[0,71,99,101,103,128,129,199,200,204,227,230,231,298,303,328,330,332,333]
-peps=["CET","TCE","CTV","VAQ","ETC","AQV"]
-for p in peps:
-	ls=LinearSpectrum(p,mass)
-	if consistent(ls,copy.deepcopy(spectrum)):
-		print p
+# spectrum=[0,71,99,101,103,128,129,199,200,204,227,230,231,298,303,328,330,332,333]
+# peps=["CET","TCE","CTV","VAQ","ETC","AQV"]
+# for p in peps:
+# 	ls=LinearSpectrum(p,mass)
+# 	if consistent(ls,copy.deepcopy(spectrum)):
+# 		print p
+
+
+
+
+def score(peptide, spectrum):
+	mass= loadMass("integer_mass_table.txt")
+	cS=cyclicSpectrum(peptide,mass)
+	lcs=len(cS)
+	lspectrum=len(spectrum)
+	a=cS
+	b=spectrum #mas gde
+	if lspectrum<lcs:
+		a=spectrum
+		b=cS
+	count =0
+	for c in a:
+		if c in b:
+			count+=1
+			b.remove(c)
+	return count
+
+
+
+pep = sys.stdin.readline().strip()
+spectrum= [int(x) for x in sys.stdin.readline().split()]
+
+print score(pep,spectrum)
+
 
 
