@@ -593,14 +593,6 @@ def Expand(Peptides, mass):
 			Pep2.append(p+m)
 	return Pep2
 
-def ExpandByMass(Peptides, mass):
-	Pep2=[]
-	for p in Peptides:
-		for m in mass:
-			Pep2.append(p+m)
-	return Pep2
-
-
 def calculateMass(peptide,mass):
 	m=0
 	for p in peptide:
@@ -745,11 +737,10 @@ def  LeaderboardCyclopeptideSequencing(N, Spectrum, AminoAcidMass):
 		Leaderboard = Expand(Leaderboard,AminoAcidMass)
 		LBcopy = copy.deepcopy(Leaderboard)
 		for peptide in Leaderboard:
-			ls=LinearSpectrum(peptide,AminoAcidMass)
+			ls=cyclicSpectrum(peptide,AminoAcidMass)
 			mass_ls = max(ls)
 			if mass_ls==mass_spectrum:
 				pscore=linearScore(peptide,Spectrum,AminoAcidMass)
-				print peptide,pscore				
 				if pscore>scoreLeaderPeptide:
 					LeaderPeptide = peptide
 					scoreLeaderPeptide=pscore
