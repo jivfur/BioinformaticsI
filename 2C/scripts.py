@@ -588,10 +588,19 @@ def cyclicSpectrum(Peptide,AminoAcidMass):
 
 def Expand(Peptides, mass):
 	Pep2=[]
+	for p in Peptides:		
+		for m in mass:			
+			Pep2.append(p+m)
+	return Pep2
+
+def ExpandWeight(Peptides, AminoAcidMass):
+	Pep2=[]
+	mass = {AminoAcidMass[x]:x for x in AminoAcidMass}
 	for p in Peptides:
 		for m in mass:
 			Pep2.append(p+m)
 	return Pep2
+
 
 def calculateMass(peptide,mass):
 	m=0
@@ -645,16 +654,16 @@ def CyclopeptideSequencing(spectrum,mass):
 
 
 
-def score(peptide, spectrum):
-	mass= loadMass("integer_mass_table.txt")
+def score(peptide, spectrum,mass):
+	# mass= loadMass("integer_mass_table.txt")
 	cS=cyclicSpectrum(peptide,mass)
 	lcs=len(cS)
 	lspectrum=len(spectrum)
-	a=cS
-	b=spectrum #mas gde
+	a=copy.deepcopy(cS)
+	b=copy.deepcopy(spectrum) #mas gde
 	if lspectrum<lcs:
-		a=spectrum
-		b=cS
+		a=copy.deepcopy(spectrum)
+		b=copy.deepcopy(cS)
 	count =0
 	for c in a:
 		if c in b:
@@ -670,14 +679,14 @@ def score(peptide, spectrum):
 # print score(pep,spectrum)
 
 def linearScore(Peptide,Spectrum, AminoAcidMass):	
-	linear= LinearSpectrum(Peptide, AminoAcidMass)	
+	linear= LinearSpectrum(Peptide, AminoAcidMass)		
 	lcs=len(linear)
 	lspectrum=len(Spectrum)
-	a=linear
-	b=Spectrum #mas gde
+	a=copy.deepcopy(linear)
+	b=copy.deepcopy(Spectrum) #mas gde
 	if lspectrum<lcs:
-		a=Spectrum
-		b=linear
+		a=copy.deepcopy(Spectrum)
+		b=copy.deepcopy(linear)
 	count =0
 	for c in a:
 		if c in b:
@@ -685,10 +694,13 @@ def linearScore(Peptide,Spectrum, AminoAcidMass):
 			b.remove(c)
 	return count
 
-
-# pep = sys.stdin.readline().strip()
+# AminoAcidMass = loadMass("integer_mass_table.txt")
+# # pep = sys.stdin.readline().strip()
 # spectrum= [int(x) for x in sys.stdin.readline().split()]
-# print(linearScore(pep,spectrum))
+# print spectrum
+# print(score("VKLFPADFNQY",spectrum,AminoAcidMass))
+
+
 def Trim(Leaderboard, Spectrum, N, AminoAcidMass):	
 	dict={}
 	for l in Leaderboard:
@@ -698,9 +710,11 @@ def Trim(Leaderboard, Spectrum, N, AminoAcidMass):
 		dict[s].append(l)	
 	s = sorted(dict.keys(),reverse=True)
 	board=[]
-	for a in s:
-		board+=dict[a]	
-	return board[0:N]
+	i=0
+	while len(board)<N:		
+		board+=dict[s[i]]	
+		i+=1
+	return board
 
 # AminoAcidMass = loadMass("integer_mass_table.txt")
 # Leaderboard=["VEADPFIFWMSEQIAMKIKAFPCNRCDNHPLSDAFTDPVYYIVFERL",
@@ -732,31 +746,40 @@ def  LeaderboardCyclopeptideSequencing(N, Spectrum, AminoAcidMass):
 	LeaderPeptide=""
 	sameScore=[]
 	mass_spectrum=max(Spectrum)
-	scoreLeaderPeptide = score(LeaderPeptide,Spectrum)
+	scoreLeaderPeptide = score(LeaderPeptide,Spectrum,AminoAcidMass)	
 	while Leaderboard:
-		Leaderboard = Expand(Leaderboard,AminoAcidMass)
+		Leaderboard = Expand(Leaderboard,AminoAcidMass)		
 		LBcopy = copy.deepcopy(Leaderboard)
 		for peptide in Leaderboard:
-			ls=cyclicSpectrum(peptide,AminoAcidMass)
-			mass_ls = max(ls)
+			ls=LinearSpectrum(peptide,AminoAcidMass)
+			mass_ls = max(ls)			
 			if mass_ls==mass_spectrum:
-				pscore=linearScore(peptide,Spectrum,AminoAcidMass)
-				if pscore>scoreLeaderPeptide:
+				pscore=score(peptide,copy.deepcopy(Spectrum),AminoAcidMass)
+				if pscore>scoreLeaderPeptide:					
 					LeaderPeptide = peptide
 					scoreLeaderPeptide=pscore
 					sameScore=[LeaderPeptide]
-				elif pscore==scoreLeaderPeptide:
+				elif pscore==scoreLeaderPeptide:					
 					sameScore+=[peptide]
 			elif mass_ls>mass_spectrum:
 				LBcopy.remove(peptide)
-		Leaderboard = LBcopy
-		if Leaderboard:
+		Leaderboard = LBcopy		
+		if len(Leaderboard)>N:
 			Leaderboard = Trim(Leaderboard,Spectrum,N,AminoAcidMass)
 	return sameScore
 
+def ExtendedAlphabet():
+	mass={}
+	for i in range(57,201):
+		mass[chr(i)]=i
+	return mass
 
-AminoAcidMass = loadMass("integer_mass_table.txt")
-#print LeaderboardCyclopeptideSequencing(10,[0,71,113,129,147,200,218,260,313,331,347,389,460],AminoAcidMass)
-print LeaderboardCyclopeptideSequencing(1000,[0,97,99,113,114,115,128,128,147,147,163,186,227,241,242,244,244,256,260,261,262,283,291,309,330,333,340,347,385,388,389,390,390,405,435,447,485,487,503,504,518,544,552,575,577,584,599,608,631,632,650,651,653,672,690,691,717,738,745,770,779,804,818,819,827,835,837,875,892,892,917,932,932,933,934,965,982,989,1039,1060,1062,1078,1080,1081,1095,1136,1159,1175,1175,1194,1194,1208,1209,1223,1322],AminoAcidMass)
 
 
+N=int(sys.stdin.readline())
+line = sys.stdin.readline().split()
+spectrum=[int(x) for x in line]
+AminoAcidMass = ExtendedAlphabet()#loadMass("integer_mass_table.txt")
+a=LeaderboardCyclopeptideSequencing(1000,spectrum,AminoAcidMass)
+for i in a:
+	print "-".join([str(AminoAcidMass[x]) for x in i])
