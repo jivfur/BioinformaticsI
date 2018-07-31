@@ -565,7 +565,7 @@ def LinearSpectrum(Peptide,AminoAcidMass):
 		for j in range(i+1,len(prefimax)):			
 			linear.append(prefimax[j]-prefimax[i])
 	return sorted(linear)
-	
+
 def cyclicSpectrum(Peptide,AminoAcidMass):
 	prefimax=[0]
 	lp = len(Peptide)
@@ -579,6 +579,7 @@ def cyclicSpectrum(Peptide,AminoAcidMass):
 			if i>0 and j<lp:
 				linear.append(peptideMass-(prefimax[j]-prefimax[i]))
 	return sorted(linear)
+
 
 
 
@@ -671,12 +672,15 @@ def score(peptide, spectrum,mass):
 			b.remove(c)
 	return count
 
+# Peptide = "MAMA" 
+# Spectrum = [0 ,71 ,178 ,202 ,202 ,202 ,333 ,333 ,333 ,404 ,507 ,507]
+# AminoAcidMass = loadMass("integer_mass_table.txt")
 
 
-# pep = sys.stdin.readline().strip()
-# spectrum= [int(x) for x in sys.stdin.readline().split()]
+# # pep = sys.stdin.readline().strip()
+# # spectrum= [int(x) for x in sys.stdin.readline().split()]
 
-# print score(pep,spectrum)
+# print score(Peptide,Spectrum,AminoAcidMass)
 
 def linearScore(Peptide,Spectrum, AminoAcidMass):	
 	linear= LinearSpectrum(Peptide, AminoAcidMass)		
@@ -694,7 +698,15 @@ def linearScore(Peptide,Spectrum, AminoAcidMass):
 			b.remove(c)
 	return count
 
+# QUIZ
+# Peptide = "PEEP"
+# Spectrum = [0 ,97 ,97 ,129 ,129 ,194 ,203 ,226 ,226 ,258 ,323 ,323 ,323 ,355 ,403 ,452]
 # AminoAcidMass = loadMass("integer_mass_table.txt")
+# print linearScore(Peptide,Spectrum,AminoAcidMass)
+
+
+
+# 
 # # pep = sys.stdin.readline().strip()
 # spectrum= [int(x) for x in sys.stdin.readline().split()]
 # print spectrum
@@ -735,6 +747,7 @@ def  LeaderboardCyclopeptideSequencing(N, Spectrum, AminoAcidMass):
 			if mass_ls==mass_spectrum:
 				pscore=score(peptide,copy.deepcopy(Spectrum),AminoAcidMass)
 				if pscore>scoreLeaderPeptide:					
+					print pscore
 					LeaderPeptide = peptide
 					scoreLeaderPeptide=pscore
 					sameScore=[LeaderPeptide]
@@ -755,10 +768,63 @@ def ExtendedAlphabet():
 
 
 
-N=int(sys.stdin.readline())
-line = sys.stdin.readline().split()
-spectrum=[int(x) for x in line]
-AminoAcidMass = ExtendedAlphabet()#loadMass("integer_mass_table.txt")
-a=LeaderboardCyclopeptideSequencing(1000,spectrum,AminoAcidMass)
-for i in a:
-	print "-".join([str(AminoAcidMass[x]) for x in i])
+# N=int(sys.stdin.readline())
+# line = sys.stdin.readline().split()
+# spectrum=[int(x) for x in line]
+# AminoAcidMass = ExtendedAlphabet()#loadMass("integer_mass_table.txt")
+# a=LeaderboardCyclopeptideSequencing(1000,spectrum,AminoAcidMass)
+# for i in a:
+# 	print "-".join([str(AminoAcidMass[x]) for x in i])
+
+import math
+
+def convolution(spectrum):
+	limit = len(spectrum)
+	cov=[]
+	for i in range(limit):
+		row=[]
+		for j in range(0,i):
+			row.append(abs(spectrum[i]-spectrum[j]))
+		cov.append(row)	
+	return cov
+
+def vectorize(matrix):	
+	return sorted([matrix[i][j] for i in range(len(matrix)) for j in range(len(matrix[i])) if matrix[i][j]!=0])
+
+# line = sys.stdin.readline().split()
+# spect=[int(x) for x in line]
+# print vectorize(covolution(spect))
+
+def frequency(vector):
+	dict={}
+	for i in range(len(vector)):
+		if not(vector[i] in dict):
+			dict[vector[i]]=0
+		dict[vector[i]]+=1
+	return dict
+
+def ConvolutionCyclopeptideSequencing(M,N,spectrum):
+	mass = frequency(vectorize(convolution(spectrum)))
+	matrix = sorted(mass.items(),key=lambda x: x[1], reverse=True)
+	AminoAcidMass={}
+	i =0
+	while len(AminoAcidMass)<=M:
+		if matrix[i][0]>56 and matrix[i][0]<201:
+			AminoAcidMass[chr(matrix[i][0])]=matrix[i][0]
+		i+=1
+	a=LeaderboardCyclopeptideSequencing(N,spectrum,AminoAcidMass)
+	for i in a:
+		print "-".join([str(AminoAcidMass[x]) for x in i])
+
+# M=int(sys.stdin.readline())
+# N=int(sys.stdin.readline())
+# line = sys.stdin.readline().split()
+# spect=[int(x) for x in line]
+# print spect
+# ConvolutionCyclopeptideSequencing(M,N,spect)
+
+
+spectrum = [0 ,86 ,160 ,234 ,308 ,320 ,382]
+mass=frequency(vectorize(convolution(spectrum)))
+print sorted(mass.items(),key=lambda x: x[1], reverse=True)
+
