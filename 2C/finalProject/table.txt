@@ -1,0 +1,4 @@
+K	N50	#long contigs	total length of long contigs
+25	40,658	123	2,794,734
+55	154,027	45	2,819,863
+85	79,093	71	2,829,100
