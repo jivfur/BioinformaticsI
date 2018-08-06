@@ -47,24 +47,52 @@ def ManhattanProblemDiag(M,N,Down,Right,Diag):
 			S[i+1][j+1]= max(S[i][j+1]+Down[i][j+1], S[i+1][j]+Right[i+1][j],S[i][j]+Diag[i][j])
 	return S[M][N]
 
-l=[int(x) for x in sys.stdin.readline().split()]
-lines = sys.stdin.read().splitlines()
-Down=[]
-for i in range(l[0]):
-	row = [int(x) for x in lines[i].split()]
-	Down.append(row)
-Right=[]
-start=l[0]+1
-for j in range(l[0]+1):
-	row = [int(x) for x in lines[start+j].split()]
-	Right.append(row)
-Diag=[]
-start+=j+2
-for j in range(l[1]):
-	row = [int(x) for x in lines[start+j].split()]
-	Diag.append(row)
+# l=[int(x) for x in sys.stdin.readline().split()]
+# lines = sys.stdin.read().splitlines()
+# Down=[]
+# for i in range(l[0]):
+# 	row = [int(x) for x in lines[i].split()]
+# 	Down.append(row)
+# Right=[]
+# start=l[0]+1
+# for j in range(l[0]+1):
+# 	row = [int(x) for x in lines[start+j].split()]
+# 	Right.append(row)
+# Diag=[]
+# start+=j+2
+# for j in range(l[1]):
+# 	row = [int(x) for x in lines[start+j].split()]
+# 	Diag.append(row)
 
-print ManhattanProblemDiag(l[0],l[1],Down,Right,Diag)
+# print ManhattanProblemDiag(l[0],l[1],Down,Right,Diag)
+
+def pretty(P):
+	for p in P:
+		print p
+
+
+def LCSBackTrack(v, w):
+	lenV = len(v)
+	lenW = len(w)
+	print lenV,lenW
+	S=[[0 for i in range(lenV+2)]for j in range(lenW+1)]
+	B =[[0 for i in range(lenV+1)]for j in range(lenW)]
+	pretty(B)
+	print len(S),len(S[0])
+	for i in range(lenV): #8
+		for j in range(lenW): #9
+			S[i+1][j+1]=max(S[i][j+1],S[i+1][j],(v[i]==w[j])+S[i][j])
+			if S[i+1][j+1]==S[i][j]+2 and v[i]==w[j]:				
+				B[i][j] = "T"
+			elif S[i+1][j+1]==S[i+1][j]:				
+				B[i][j] = "R"
+			elif S[i+1][j+1]==S[i][j+1]:
+				B[i][j] = "D"
+	pretty(S)
+	pretty(B)
+
+
+LCSBackTrack("AACCTTGG","ACACTGTGA")
 
 
 
